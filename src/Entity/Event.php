@@ -13,34 +13,19 @@ class Event
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private int $id;
 
-    #[Assert\NotBlank()]
     #[ORM\ManyToOne(inversedBy: 'events')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(length: 255, nullable: true)]
     private ?Organisation $organisation = null;
 
-    #[Assert\NotBlank()]
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private string $name;
 
-    #[Assert\NotBlank()]
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $startDate = null;
-
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTime $endTime = null;
-
-    #[Assert\NotBlank()]
-    #[ORM\Column(length: 255)]
-    private ?string $place = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $address = null;
-
-    #[Assert\NotBlank()]
-    #[ORM\Column(length: 255)]
-    private ?string $town = null;
+    private \DateTime $startDate;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
@@ -48,20 +33,22 @@ class Event
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $poster = null;
 
-    #[Assert\NotBlank()]
     #[ORM\Column(length: 255)]
     private ?string $fee = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
 
-    #[Assert\NotBlank()]
     #[ORM\Column(length: 255)]
     private ?string $thematic = null;
 
-    #[Assert\NotBlank()]
-    #[ORM\Column(length: 255)]
+     #[ORM\Column(length: 255)]
     private ?string $public = null;
+
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
+    #[ORM\ManyToOne(inversedBy: 'events')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Location $location;
 
     public function getId(): ?int
     {
@@ -100,54 +87,6 @@ class Event
     public function setStartDate(\DateTime $startDate): static
     {
         $this->startDate = $startDate;
-
-        return $this;
-    }
-
-    public function getEndTime(): ?\DateTime
-    {
-        return $this->endTime;
-    }
-
-    public function setEndTime(?\DateTime $endTime): static
-    {
-        $this->endTime = $endTime;
-
-        return $this;
-    }
-
-    public function getPlace(): ?string
-    {
-        return $this->place;
-    }
-
-    public function setPlace(string $place): static
-    {
-        $this->place = $place;
-
-        return $this;
-    }
-
-    public function getAddress(): ?string
-    {
-        return $this->address;
-    }
-
-    public function setAddress(?string $address): static
-    {
-        $this->address = $address;
-
-        return $this;
-    }
-
-    public function getTown(): ?string
-    {
-        return $this->town;
-    }
-
-    public function setTown(string $town): static
-    {
-        $this->town = $town;
 
         return $this;
     }
@@ -220,6 +159,18 @@ class Event
     public function setPublic(string $public): static
     {
         $this->public = $public;
+
+        return $this;
+    }
+
+    public function getLocation(): Location
+    {
+        return $this->location;
+    }
+
+    public function setLocation(Location $location): static
+    {
+        $this->location = $location;
 
         return $this;
     }

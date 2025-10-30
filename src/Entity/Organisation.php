@@ -23,28 +23,30 @@ class Organisation
     /**
      * @var Collection<int, User>
      */
-    #[Assert\NotBlank()]
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'organisations')]
     private Collection $contacts;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $address = null;
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
+    #[ORM\Column(length: 255, nullable: false)]
+    private string $address = '';
 
-    #[Assert\NotBlank()]
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
+    #[ORM\Column(length: 255, nullable: false)]
+    private string $town = '';
+
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
+    #[Assert\Email(message: "L'Email que vous avez renseigné n'est pas valide")]
+    #[ORM\Column(length: 255, nullable: false)]
+    private string $email = '';
+
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
+    #[ORM\Column(length: 30, nullable: false)]
+    #[Assert\Regex(pattern: '/^\+?[0-9\s\-().]{6,20}$/', message: 'Le numéro de téléphone n\'est pas valide.')]
+    private string $phone = '';
+
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(length: 255)]
-    private ?string $town = null;
-
-    #[Assert\NotBlank()]
-    #[Assert\Email()]
-    #[ORM\Column(length: 255)]
-    private ?string $email = null;
-
-    #[ORM\Column(length: 20, nullable: true)]
-    private ?string $phone = null;
-
-    #[Assert\NotBlank()]
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
+    private string $status = '';
 
     /**
      * @var Collection<int, Event>
@@ -58,12 +60,12 @@ class Organisation
         $this->events = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -102,19 +104,19 @@ class Organisation
         return $this;
     }
 
-    public function getAddress(): ?string
+    public function getAddress(): string
     {
         return $this->address;
     }
 
-    public function setAddress(?string $address): static
+    public function setAddress(string $address): static
     {
         $this->address = $address;
 
         return $this;
     }
 
-    public function getTown(): ?string
+    public function getTown(): string
     {
         return $this->town;
     }
@@ -126,7 +128,7 @@ class Organisation
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -138,12 +140,12 @@ class Organisation
         return $this;
     }
 
-    public function getPhone(): ?string
+    public function getPhone(): string
     {
         return $this->phone;
     }
 
-    public function setPhone(?string $phone): static
+    public function setPhone(string $phone): static
     {
         $this->phone = $phone;
 

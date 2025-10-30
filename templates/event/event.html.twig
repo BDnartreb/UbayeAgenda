@@ -1,0 +1,22 @@
+{% extends 'front.html.twig' %}
+
+{% block title %}Event Name{% endblock %}
+
+{% block content %}
+
+<div class="main-container">
+    <div class="event-description-container">
+        <div class="poster-big-format">
+            <img src="{{ asset('images/poster.jpg') }}" alt="Affiche de l'événement">
+        </div>
+        <div class="event-description-card">
+                <div class="description-card-name"><h2>Event Name</h2></div>
+                <div class="description-card-time-location"><h2>11h30 - Lieu de Event</h2></div>
+                <div class="description-card-organizer"><h3>Présenté par : Organisateur Name</h3></div>
+                <div class="description-card-description"><h3>Description</h3></div>
+                <div class="description-card-comment"><h3>Commentaires</h3></div>
+                <div class="description-card-moreinfo"><h4>Spectacle - Gratuit - Tout public</h4></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

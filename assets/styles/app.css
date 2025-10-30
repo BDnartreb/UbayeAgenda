@@ -1,3 +1,151 @@
-body {
-    background-color: skyblue;
+
+/* HEADER */
+.navbar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between;
+    background-image: url('../images/nav-banner.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 175px;
+    background-color: green;
 }
+
+.logo {
+    color: white;
+    font-family:'Courier New', Courier, monospace;
+    font-size: 30px;
+    padding-left: 150px;
+}
+
+.navbar-collapse {
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+}
+
+.navbar-item a {
+    color: orange;
+}
+
+.header-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+}
+
+.footer-container {
+    color:white;
+    background-color: blue;
+}
+
+
+
+/* BODY */
+body {
+    background-color: white;
+}
+
+/* PAGE AGENDA */
+.main-container {
+    display: flex;
+    flex-direction: row;
+    max-width: 1440px;
+    justify-content: center;
+}
+
+.left-container {
+    width: 20%;
+    min-width: 200px;
+    background-color: rgba(0,128,0,0.5);
+    
+}
+
+.agenda-container{
+    width: 80%;
+
+    /* background-color: rgba(0,0,128,0.5); */
+}
+
+.day-container {
+    display: flex;
+    flex-direction: column;
+
+
+}
+
+.day{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 0px 20px 0px 20px;
+}
+.day-before{
+
+
+}
+.day{
+}
+.day-after{
+}
+.event-card{
+    display: flex;
+    flex-direction: row;
+    margin: 10px 0px 10px 0px;
+}
+.event-poster{
+    width: 100px;
+    height: 140px;
+}
+.event-poster img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.event-info{
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    margin-left: 10px;
+    padding-left: 10px;
+}
+.event-time-location{}
+.event-name{}
+.event-organizer{}
+.event-moreinfo{}
+
+
+/* PAGE EVENT */
+.event-description-container{
+    display: flex;
+    margin: 30px 0px 30px 0px;
+}
+
+.poster-big-format{
+    width: 400px;
+    height: 560px;
+}
+
+.poster-big-format img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.event-description-card{
+    width: 600px;
+    margin-left: 25px;
+    padding-left: 10px;
+}
+
+.description-card-time-location{}
+.description-card-name{}
+.description-card-organizer{}
+.description-card-description{}
+.description-card-comment{}
+.description-card-moreinfo{}
+
