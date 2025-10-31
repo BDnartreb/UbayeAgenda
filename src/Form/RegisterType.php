@@ -22,12 +22,12 @@ class RegisterType extends AbstractType
             ->add('lastName')
             ->add('phone')
             ->add('organisations', EntityType::class, [
-                'label' => 'Organisateur',
+                'label' => 'Organisation',
+                'placeholder' => "Sélectionner une ou plusieurs organisations",
                 'class' => Organisation::class,
-                'choise_type' => '',
                 'choice_label' => 'name', // ou un autre champ pertinent
                 'multiple' => true,
-                'expanded' => true, // true = cases à cocher, false = liste déroulante multiple
+                'expanded' => false, // true = cases à cocher, false = liste déroulante multiple
             ])
             // ->add('organisations', EntityType::class, [
             //     'class' => Organisation::class,

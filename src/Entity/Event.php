@@ -15,9 +15,10 @@ class Event
     #[ORM\Column]
     private int $id;
 
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\ManyToOne(inversedBy: 'events')]
-    #[ORM\JoinColumn(length: 255, nullable: true)]
-    private ?Organisation $organisation = null;
+    #[ORM\JoinColumn(nullable: false)]
+    private Organisation $organisation;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(length: 255)]

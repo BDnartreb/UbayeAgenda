@@ -39,14 +39,6 @@ final class UserController extends AbstractController
         return $this->render('home/register.html.twig', ['form' => $form]);
     }
 
-    #[Route('/user/update/{id}', name: 'user_update')]
-    public function update(): Response
-    {
-        return $this->render('home/register.html.twig', [
-            'controller_name' => 'UserController',
-        ]);
-    }
-
     #[Route('/user/profile', name: 'user_profile')]
     public function userProfile(): Response
     // #[Route('/user/profile/{id}', name: 'user_profile')]
@@ -56,6 +48,15 @@ final class UserController extends AbstractController
             'controller_name' => 'UserController',
         ]);
     }
+
+    // REVOIR update et delete par User et Admin
+    // #[Route('/user/update/{id}', name: 'user_update')]
+    // public function update(): Response
+    // {
+    //     return $this->render('home/register.html.twig', [
+    //         'controller_name' => 'UserController',
+    //     ]);
+    // }
 
     #[Route('/admin/user/delete/{id}', name: 'user_delete')]
     public function delete(): Response

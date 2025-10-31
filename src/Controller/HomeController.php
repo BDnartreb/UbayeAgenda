@@ -21,10 +21,10 @@ final class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/organisations', name: 'organisations')]
-    public function organisations(): Response
+    #[Route('/posters', name: 'posters')]
+    public function posters(): Response
     {
-        return $this->render('home/organisations.html.twig', [
+        return $this->render('home/posters.html.twig', [
             'controller_name' => 'HomeController',
         ]);
     }
@@ -33,6 +33,14 @@ final class HomeController extends AbstractController
     public function contact(): Response
     {
         return $this->render('home/contact.html.twig', [
+            'controller_name' => 'HomeController',
+        ]);
+    }
+
+    #[Route('/about', name: 'about')]
+    public function about(): Response
+    {
+        return $this->render('home/about.html.twig', [
             'controller_name' => 'HomeController',
         ]);
     }

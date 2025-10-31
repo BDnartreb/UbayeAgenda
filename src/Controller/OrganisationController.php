@@ -12,6 +12,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class OrganisationController extends AbstractController
 {
+    /**
+     * show list of organisations
+     */
     #[Route('/admin/organisations', name: 'organisations')]
     public function organisations(): Response
     {
@@ -20,8 +23,21 @@ final class OrganisationController extends AbstractController
         ]);
     }
 
+    /**
+     * show the personal page of the organisation if exist
+     */
+    // #[Route('/organisation/{id}', name: 'organisations')]
+    // public function organisation(int $id): Response
+    #[Route('/organisation', name: 'organisation')]
+    public function organisation(): Response
+    {
+        return $this->render('organisation/organisation.html.twig', [
+            'controller_name' => 'HomeController',
+        ]);
+    }
 
-    #[Route('/organisation/add', name: 'orga_add')]
+
+    #[Route('/user/organisation/add', name: 'orga_add')]
     public function add(Request $request, EntityManagerInterface $em): Response
     {
         $organisation = new Organisation();
@@ -32,7 +48,7 @@ final class OrganisationController extends AbstractController
 
             $em->persist($organisation);
             $em->flush();
-            $this->addFlash('success', 'Votre organisation a bien été enregsitrée !');
+            $this->addFlash('success', 'Votre organisation a bien été enregistrée !');
 
             // Back to the previous page
             $referer = $request->headers->get('referer');
@@ -47,18 +63,19 @@ final class OrganisationController extends AbstractController
             );
         }
 
-        return $this->render('/organisation/organisationForm.html.twig', ['form' => $form]);
+        return $this->render('/user/organisationForm.html.twig', ['form' => $form]);
     }
 
-    #[Route('/organisation/update/{id}', name: 'orga_update')]
+
+    #[Route('/user/organisation/update/{id}', name: 'orga_update')]
     public function updateOrganization(): Response
     {
         return $this->render('organisation/update.html.twig', [
             'controller_name' => 'OrganisationController',
         ]);
     }
-     
-    #[Route('/admin/organisation/delete/{id}', name: 'admin_orga_delete')]
+    
+    #[Route('/user/organisation/delete/{id}', name: 'admin_orga_delete')]
     public function delete(): Response
     {
         return $this->render('organisation/delete.html.twig', [

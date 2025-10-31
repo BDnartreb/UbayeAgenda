@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% include 'partials/_header.html.twig' %}
+
+
+
+
+    <main>
+        <div class="main-container">
+            <div class="left-container">ADMIN</div>
+            
+            {% block content %}{% endblock %}
+
+        </div>
+    </main>
+    
+    {% include 'partials/_footer.html.twig' %}
+{% endblock %}
