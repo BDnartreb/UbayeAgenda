@@ -14,7 +14,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Enum\PublicEnum;
 use App\Enum\FeeEnum;
+use App\Enum\ThematicEnum;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
 
 class EventType extends AbstractType
 {
@@ -30,20 +32,34 @@ class EventType extends AbstractType
                 'required' => true,
             ])
             ->add('description', TextType::class, ['label' => "Description",])
-            ->add('poster', TextType::class, ['label' => 'Affiche'])
-            //->add('fee', TextType::class, ['label' => 'Tarif'])
+            ->add('poster', TextType::class, [
+                'label' => 'Affiche',
+                'required' => false,
+            ])
             ->add('fee', ChoiceType::class, [
                 'label' => 'Tarif',
                 'choices' => FeeEnum::cases(),
                 'choice_label' => fn (FeeEnum $fee) => ucfirst($fee->value),
                 'placeholder' => "Sélectionner un tarif",
+                'required' => true,
             ])
-            ->add('comment', TextareaType::class, ['label' => 'Commentaires'])
-            ->add('thematic', TextType::class, ['label' => 'Thématique'])
+            ->add('comment', TextareaType::class, [
+                'label' => 'Commentaires',
+                'required' => false,
+            ])
+            ->add('thematic', ChoiceType::class, [
+                'label' => 'Thématique',
+                'choices' => ThematicEnum::cases(),
+                'choice_label' => fn (ThematicEnum $thematic) => ucfirst($thematic->value),
+                'placeholder' => "Sélectionner une thématique",
+                'required' => true,
+            ])
             ->add('public', ChoiceType::class, [
+                'label' => 'Catégorie de public',
                 'choices' => PublicEnum::cases(),
                 'choice_label' => fn (PublicEnum $public) => ucfirst($public->value),
                 'placeholder' => "Sélectionner une catégorie de public",
+                'required' => true,
             ])
             // ->add('organisation', EntityType::class, [
             //     'class' => Organisation::class,
@@ -53,7 +69,7 @@ class EventType extends AbstractType
                 'class' => Organisation::class,
                 'choice_label' => 'name',
                 'placeholder' => '— Sélectionner une organisation —',
-                'required' => false,
+                'required' => true,
             ])
             ->add('newOrganisation', OrganisationType::class, [
                 'mapped' => false,
@@ -62,7 +78,9 @@ class EventType extends AbstractType
             ])
             ->add('location', EntityType::class, [
                 'class' => Location::class,
-                'choice_label' => 'id',
+                'choice_label' => 'name',
+                'placeholder' => '— Sélectionner un lieu —',
+                'required' => true,
             ])
         ;
     }

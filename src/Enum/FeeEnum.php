@@ -5,6 +5,6 @@ namespace App\Enum;
 enum FeeEnum: string
 {
     case FREE = 'Entrée Libre';
-    case FREEPAID = 'Prix Libre';
+    case FREEPRICE = 'Prix Libre';
     case PAID = 'Payant';
 }

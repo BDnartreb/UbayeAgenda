@@ -13,13 +13,22 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class EventController extends AbstractController
 {
-    // #[Route('/event/{id}', name: 'event')]
-    // public function event(int $id): Response
-    #[Route('/event', name: 'event')]
-    public function event(): Response
+
+    protected EntityManagerInterface $em;
+
+    public function __construct(
+        EntityManagerInterface $em,
+    )
+    {
+        $this->em = $em;
+    }
+
+
+    #[Route('/event/{id}', name: 'event')]
+    public function event(Event $event): Response
     {
         return $this->render('event/event.html.twig', [
-            'controller_name' => 'EventController',
+            'event' => $event,
         ]);
     }
 
@@ -37,7 +46,7 @@ final class EventController extends AbstractController
 
             $this->addFlash('success', 'Événement créé avec succès !');
 
-            return $this->redirectToRoute('event');
+            return $this->redirectToRoute('event', ['id' => $event->getId()]);
         }
 
         return $this->render('user/eventForm.html.twig', ['form' => $form]);
@@ -49,6 +58,7 @@ final class EventController extends AbstractController
     public function update(int $id, EventRepository $eventRepository, Request $request, EntityManagerInterface $em): Response
     {
         $event = $eventRepository->find($id);
+        //dd($event);
         $form = $this->createForm(EventType::class, $event)->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid())
@@ -58,7 +68,7 @@ final class EventController extends AbstractController
 
             $this->addFlash('success', 'Événement modifié avec succès !');
 
-            return $this->redirectToRoute('event');
+            return $this->redirectToRoute('event', ['id' => $event->getId()]);
         }
 
         return $this->render('user/eventForm.html.twig', ['form' => $form]);

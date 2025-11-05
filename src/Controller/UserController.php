@@ -10,30 +10,43 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class UserController extends AbstractController
 {
+    protected EntityManagerInterface $em;
+    private UserPasswordHasherInterface $userPasswordHasher;
+
+    public function __construct(
+        EntityManagerInterface $em,
+        UserPasswordHasherInterface $userPasswordHasher,
+        )
+    {
+        $this->em = $em;
+        $this->userPasswordHasher = $userPasswordHasher;
+    }
+
     #[Route('/register', name: 'register', methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function register(Request $request, EntityManagerInterface $entityManager,
-     UserPasswordHasherInterface $userPasswordHasher): Response
+    public function register(Request $request): Response
     {
         $user = new User();
 
         $form = $this->createForm(RegisterType::class, $user)->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $plainPassword = $form->get('password')->getData();
-            $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
+            $plainPassword = $form->get('plainPassword')->getData();
+            $user->setPassword($this->userPasswordHasher->hashPassword($user, $plainPassword));
             $user->setRoles(['ROLE_USER']);
             $organisations = $form->get('organisations')->getData();
             foreach ($organisations as $organisation) {
                 $organisation->addContact($user);
-                $entityManager->persist($organisation);
+                $this->em->persist($organisation);
             }
-            $entityManager->persist($user);
-            $entityManager->flush();
+            $this->em->persist($user);
+            $this->em->flush();
             $this->addFlash('success', 'Inscription réussie. Vous pouvez vous connecter !');
-            return $this->redirectToRoute('app_login');
+            
+            return $this->redirectToRoute('login');
         }
 
         return $this->render('home/register.html.twig', ['form' => $form]);
@@ -50,13 +63,27 @@ final class UserController extends AbstractController
     }
 
     // REVOIR update et delete par User et Admin
-    // #[Route('/user/update/{id}', name: 'user_update')]
-    // public function update(): Response
-    // {
-    //     return $this->render('home/register.html.twig', [
-    //         'controller_name' => 'UserController',
-    //     ]);
-    // }
+    #[Route('/user/update/{id}', name: 'user_update')]
+    public function update(Request $request, int $id): Response
+    {
+        $user = $this->em->getRepository(User::class)->find($id);
+        $form = $this->createForm(RegisterType::class, $user)->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            $plainPassword = $form->get('plainPassword')->getData();
+            if(!empty($plainPassword)){
+                $user->setPassword($this->userPasswordHasher->hashPassword($user, $plainPassword));
+            }
+            $this->em->persist($user);
+            $this->em->flush();
+
+            return $this->redirectToRoute('login');
+        }
+
+        return $this->render('home/register.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
 
     #[Route('/admin/user/delete/{id}', name: 'user_delete')]
     public function delete(): Response

@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -28,14 +28,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var list<string> The user roles
      */
-    #[Assert\NotBlank()]
+    //#[Assert\NotBlank()]
     #[ORM\Column]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
-    #[Assert\NotBlank()]
+    // #[Assert\NotBlank()]
     #[ORM\Column]
     private ?string $password = null;
 
@@ -53,6 +53,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $lastName = null;
 
+    // #[Assert\NotBlank()]
+    // #[Assert\Regex(pattern: "/^(\+33|0)[1-9](\d{2}){4}$/", message: "Le numéro de téléphone n'est pas valide")]
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $phone = null;
 

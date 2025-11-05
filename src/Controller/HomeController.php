@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Event;
 use App\Entity\User;
 use App\Form\RegisterType;
+use App\Repository\EventRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,10 +16,12 @@ use Symfony\Component\Routing\Attribute\Route;
 final class HomeController extends AbstractController
 {
     #[Route('/', name: 'home')]
-    public function index(): Response
+    public function index(EventRepository $eventRepository,): Response
     {
+        $events = $eventRepository->findAll();
         return $this->render('home/home.html.twig', [
             'controller_name' => 'HomeController',
+            'events' => $events,
         ]);
     }
 
@@ -37,10 +41,10 @@ final class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/about', name: 'about')]
+    #[Route('/charter', name: 'charter')]
     public function about(): Response
     {
-        return $this->render('home/about.html.twig', [
+        return $this->render('home/charter.html.twig', [
             'controller_name' => 'HomeController',
         ]);
     }

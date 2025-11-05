@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use App\Enum\FeeEnum;
+use App\Enum\PublicEnum;
+use App\Enum\ThematicEnum;
 use App\Repository\EventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -25,7 +28,7 @@ class Event
     private string $name;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private \DateTime $startDate;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -34,17 +37,17 @@ class Event
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $poster = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $fee = null;
+    #[ORM\Column(enumType: FeeEnum::class)]
+    private ?FeeEnum $fee = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $thematic = null;
+    #[ORM\Column(enumType: ThematicEnum::class)]
+    private ?ThematicEnum $thematic = null;
 
-     #[ORM\Column(length: 255)]
-    private ?string $public = null;
+     #[ORM\Column(enumType: PublicEnum::class)]
+    private ?PublicEnum $public = null;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\ManyToOne(inversedBy: 'events')]
@@ -116,12 +119,12 @@ class Event
         return $this;
     }
 
-    public function getFee(): ?string
+    public function getFee(): ?FeeEnum
     {
         return $this->fee;
     }
 
-    public function setFee(string $fee): static
+    public function setFee(FeeEnum $fee): self
     {
         $this->fee = $fee;
 
@@ -133,31 +136,31 @@ class Event
         return $this->comment;
     }
 
-    public function setComment(?string $comment): static
+    public function setComment(?string $comment): self
     {
         $this->comment = $comment;
 
         return $this;
     }
 
-    public function getThematic(): ?string
+    public function getThematic(): ?ThematicEnum
     {
         return $this->thematic;
     }
 
-    public function setThematic(string $thematic): static
+    public function setThematic(ThematicEnum $thematic): self
     {
         $this->thematic = $thematic;
 
         return $this;
     }
 
-    public function getPublic(): ?string
+    public function getPublic(): ?PublicEnum
     {
         return $this->public;
     }
 
-    public function setPublic(string $public): static
+    public function setPublic(PublicEnum $public): self
     {
         $this->public = $public;
 
