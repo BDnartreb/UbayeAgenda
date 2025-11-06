@@ -12,28 +12,39 @@
         <div class="left-container">Filtres</div>
         <div class="agenda-container">
             <div class="day-container">
-                <div class="day">
-                    <div class="day-before"><h1><i class="fa-solid fa-caret-left"></i></h1></div>
-                    <div class="day"><h1>Mardi 23 septembre 2025</h1></div>
-                    <div class="day-after"><h1><i class="fa-solid fa-caret-right"></i></h1></div>
-                </div>
-                {% for event in events %}
-                <a href="{{ path('event', {'id': event.getId()}) }}">
 
-                <div class="events">
-                    <div class="event-card">
-                        <div class="event-poster">
-                            <img src="{{ asset('images/poster.jpg') }}" alt="Affiche de l'événement">
-                        </div>
-                        <div class="event-info">
-                            <div class="event-time-location"><h2>{{ event.startDate|date('H:i') }} - {{ event.location.name }}</h2></div>
-                            <div class="event-name"><h2>{{ event.name }}</h2></div>
-                            <div class="event-organizer"><h3>Présenté par : {{ event.organisation.name }}</h3></div>
-                            <div class="event-moreinfo"><h4>{{ event.thematic.value }} - {{ event.fee.value }} - {{ event.public.value }}</h4></div>
-                        </div>
+                {% set currentDate = null %}
+
+                {% for event in events %}
+                    {% set eventDate = event.startDate|date('Y-m-d') %}
+
+                    {% if eventDate != currentDate %}
+                        <div class="day">
+                            {# <div class="day-before"><h1><i class="fa-solid fa-caret-left"></i></h1></div> #}
+                            <div class="day"><h1>{{ event.startDate|date('l j F Y') }}</h1></div>
+                            {# <div class="day-after"><h1><i class="fa-solid fa-caret-right"></i></h1></div> #}
+                        </div>                                  
+                    {% endif %}
+
+                    <div class="events">
+                        <a href="{{ path('event', {'id': event.getId()}) }}">
+                            <div class="event-card">
+                                <div class="event-poster">
+                                    <img src="{{ asset('images/poster.jpg') }}" alt="Affiche de l'événement">
+                                </div>
+                                <div class="event-info">
+                                    <div class="event-time-location"><h2>{{ event.startDate|date('H:i') }} - {{ event.location.name }}</h2></div>
+                                    <div class="event-name"><h2>{{ event.name }}</h2></div>
+                                    <div class="event-organizer"><h3>Présenté par : {{ event.organisation.name }}</h3></div>
+                                    <div class="event-moreinfo"><h4>{{ event.thematic.value }} - {{ event.fee.value }} - {{ event.public.value }}</h4></div>
+                                </div>
+                            </div>
+                        
+                        </a>
                     </div>
-                </div>
-                </a>
+
+                    {% set currentDate = eventDate %}
+                    
                 {% endfor %}
             </div> 
         </div>

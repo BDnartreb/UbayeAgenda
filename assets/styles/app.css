@@ -87,6 +87,10 @@ body {
 }
 .day-after{
 }
+
+.events a {
+    text-decoration: none;
+}
 .event-card{
     display: flex;
     flex-direction: row;
@@ -141,7 +145,16 @@ body {
 .description-card-time-location{}
 .description-card-name{}
 .description-card-organizer{}
-.description-card-description{}
+.description-card-description{
+
+}
 .description-card-comment{}
 .description-card-moreinfo{}
 
+.limited-textarea {
+    width: 100%;
+    resize: none;         /* Empêche le redimensionnement */
+    overflow-y: auto;     /* Ajoute un scroll si le texte dépasse */
+    line-height: 1.5em;   /* Hauteur d'une ligne */
+    height: calc(1.5em * 3); /* 3 lignes visibles */
+}

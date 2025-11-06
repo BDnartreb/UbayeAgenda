@@ -121,7 +121,8 @@ class AppFixtures extends Fixture
             $event = new Event();
             $event->setOrganisation($organisations[random_int(0,count($organisations)-1)]);
             $event->setName("EventName" . $j);
-            $event->setStartDate(new \DateTime());
+            //$event->setStartDate(new \DateTime());
+            $event->setStartDate($faker->dateTimeBetween('-2 days', '+10 days'));
             $event->setLocation($locations[random_int(0,count($locations)-1)]);
             $event->setDescription($faker->paragraphs(10, true));
             $event->setPoster($faker->imageUrl(330, 500, 'poster', true));
