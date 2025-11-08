@@ -4,7 +4,7 @@ namespace App\Enum;
 
 enum StatusEnum: string
 {
-    case Association = 'Association';
-    case Institution = 'Institution publique';
-    case Individual = 'Particulier';
+    case ASSOCIATION = 'Association';
+    case INSTITUTION = 'Institution publique';
+    case INDIVIDUAL = 'Particulier';
 }

@@ -5,15 +5,32 @@ namespace App\Repository;
 use App\Entity\Organisation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * @extends ServiceEntityRepository<Organisation>
  */
-class OrganisationRepository extends ServiceEntityRepository
+class OrganisationRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Organisation::class);
+    }
+
+    /**
+     * Used to upgrade (rehash) the organisation's password automatically over time.
+     */
+    public function upgradePassword(PasswordAuthenticatedUserInterface $organisation, string $newHashedPassword): void
+    {
+        if (!$organisation instanceof Organisation) {
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $organisation::class));
+        }
+
+        $organisation->setPassword($newHashedPassword);
+        $this->getEntityManager()->persist($organisation);
+        $this->getEntityManager()->flush();
     }
 
     //    /**

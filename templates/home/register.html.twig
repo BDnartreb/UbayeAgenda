@@ -19,13 +19,17 @@
                         <h1 class="h3 mb-3 fw-normal">Bienvenue !</h1>
                         {{ form_errors(form) }}
                         <fieldset class="mb-3">
+                            <div class="mb-3">{{ form_row(form.name) }}</div>
+                            <div class="mb-3">{{ form_row(form.address) }}</div>
+                            <div class="mb-3">{{ form_row(form.town) }}</div>
+                            <div class="mb-3">{{ form_row(form.email) }}</div>
+                            <div class="mb-3">{{ form_row(form.phone) }}</div>
+                            <div class="mb-3">{{ form_row(form.status) }}</div>
                             <div class="mb-3">{{ form_row(form.firstName) }}</div>
                             <div class="mb-3">{{ form_row(form.lastName) }}</div>
-                            <div class="mb-3">{{ form_row(form.email) }}</div>
                             <div class="mb-3">{{ form_row(form.plainPassword) }}</div>
-                            <div class="mb-3">{{ form_row(form.phone) }}</div>
-                            <div class="mb-3">{{ form_row(form.organisations) }}
-                            </div>
+
+                            
                             <label>
                                 <input type="checkbox" name="charter" required>
                                 J’ai lu <a href="/charter" target="_blank">la charte d'utilisation de ce site</a> et je m'engage à la respecter.

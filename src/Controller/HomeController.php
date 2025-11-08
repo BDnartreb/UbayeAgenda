@@ -2,25 +2,24 @@
 
 namespace App\Controller;
 
-use App\Entity\Event;
-use App\Entity\User;
-use App\Form\RegisterType;
 use App\Repository\EventRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class HomeController extends AbstractController
 {
     #[Route('/', name: 'home')]
     public function index(EventRepository $eventRepository,): Response
+    {    
+        return $this->redirectToRoute('eventlist');
+    }
+
+    #[Route('/eventlist', name: 'eventlist')]
+    public function eventlist(EventRepository $eventRepository,): Response
     {
-        //$events = $eventRepository->findAll();
         $events = $eventRepository->findAllOrderedByStartDateFromNow();
-        return $this->render('home/home.html.twig', [
+        return $this->render('home/eventlist.html.twig', [
             'controller_name' => 'HomeController',
             'events' => $events,
         ]);

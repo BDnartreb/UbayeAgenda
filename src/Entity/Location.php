@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use App\Enum\TownEnum;
 use App\Repository\LocationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name : 'Location')]
 #[ORM\Entity(repositoryClass: LocationRepository::class)]
@@ -22,8 +24,9 @@ class Location
     #[ORM\Column(length: 255)]
     private ?string $address = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $town = null;
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
+    #[ORM\Column(enumType: TownEnum::class)]
+    private ?TownEnum $town = null;
 
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $lon = null;
@@ -71,12 +74,12 @@ class Location
         return $this;
     }
 
-    public function getTown(): ?string
+    public function getTown(): TownEnum
     {
         return $this->town;
     }
 
-    public function setTown(string $town): static
+    public function setTown(TownEnum $town): static
     {
         $this->town = $town;
 
@@ -129,9 +132,9 @@ class Location
     {
         if ($this->events->removeElement($event)) {
             // set the owning side to null (unless already changed)
-            if ($event->getLocation() === $this) {
-                $event->setLocation(null);
-            }
+            // if ($event->getLocation() === $this) {
+            //     $event->setLocation(null);
+            // }
         }
 
         return $this;

@@ -2,14 +2,20 @@
 
 namespace App\Entity;
 
+use App\Enum\StatusEnum;
+use App\Enum\TownEnum;
 use App\Repository\OrganisationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrganisationRepository::class)]
-class Organisation
+#[ORM\Table(name: '`organisation`')]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -20,19 +26,13 @@ class Organisation
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    /**
-     * @var Collection<int, User>
-     */
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'organisations')]
-    private Collection $contacts;
-
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(length: 255, nullable: false)]
     private string $address = '';
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
-    #[ORM\Column(length: 255, nullable: false)]
-    private string $town = '';
+    #[ORM\Column(enumType: TownEnum::class)]
+    private ?TownEnum $town = null;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[Assert\Email(message: "L'Email que vous avez renseigné n'est pas valide")]
@@ -45,8 +45,28 @@ class Organisation
     private string $phone = '';
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
+    #[ORM\Column(enumType: StatusEnum::class)]
+    private ?StatusEnum $status = null;
+
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
+    #[ORM\Column(length: 255, nullable: false)]
+    private ?string $firstName = '';
+
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
+    #[ORM\Column(length: 255, nullable: false)]
+    private ?string $lastName = '';
+
+    /**
+     * @var string The hashed password
+     */
     #[ORM\Column(length: 255)]
-    private string $status = '';
+    private ?string $password = null;
+
+    /**
+     * @var list<string> The user roles
+     */
+    #[ORM\Column(length: 20)]
+    private array $roles = [];
 
     /**
      * @var Collection<int, Event>
@@ -54,9 +74,10 @@ class Organisation
     #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'organisation')]
     private Collection $events;
 
+
+    
     public function __construct()
     {
-        $this->contacts = new ArrayCollection();
         $this->events = new ArrayCollection();
     }
 
@@ -77,33 +98,6 @@ class Organisation
         return $this;
     }
 
-    /**
-     * @return Collection<int, User>
-     */
-    public function getContacts(): Collection
-    {
-        return $this->contacts;
-    }
-
-    public function addContact(User $contact): static
-    {
-        if (!$this->contacts->contains($contact)) {
-            $this->contacts->add($contact);
-            $contact->addOrganisation($this);
-        }
-
-        return $this;
-    }
-
-    public function removeContact(User $contact): static
-    {
-        if ($this->contacts->removeElement($contact)) {
-            $contact->removeOrganisation($this);
-        }
-
-        return $this;
-    }
-
     public function getAddress(): string
     {
         return $this->address;
@@ -116,12 +110,12 @@ class Organisation
         return $this;
     }
 
-    public function getTown(): string
+    public function getTown(): ?TownEnum
     {
         return $this->town;
     }
 
-    public function setTown(string $town): static
+    public function setTown(TownEnum $town): static
     {
         $this->town = $town;
 
@@ -152,14 +146,75 @@ class Organisation
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): ?StatusEnum
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(StatusEnum $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): static
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): static
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
 
         return $this;
     }
@@ -192,6 +247,20 @@ class Organisation
         }
 
         return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+        /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 
     // public function __toString(): string

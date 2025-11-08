@@ -17,7 +17,7 @@ class OrganisationType extends AbstractType
         $builder
             ->add('name', TextType::class, ['label' => "Nom de l'organisation"])
             ->add('address', TextType::class, ['label' => "Adresse"])
-            ->add('town', TextType::class, ['label' => "Ville"])
+            ->add('town', TextType::class, ['label' => "Commune"])
             ->add('email', TextType::class, ['label' => "Email"])
             ->add('phone', TextType::class, ['label' => "Téléphone"])
             //->add('status', EntityType::class, [
@@ -27,12 +27,6 @@ class OrganisationType extends AbstractType
                 'choice_label' => fn (StatusEnum $status) => ucfirst($status->value),
                 'placeholder' => "Sélectionner",
             ])
-            // ->add('contacts', EntityType::class, [
-            //     'label' => 'Personne référente',
-            //     'class' => User::class,
-            //     'choice_label' => 'id',
-            //     'multiple' => true,
-            // ])
         ;
     }
 
