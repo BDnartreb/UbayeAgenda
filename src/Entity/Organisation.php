@@ -71,7 +71,7 @@ class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Event>
      */
-    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'organisation')]
+    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'organisation', cascade: ['remove'])]
     private Collection $events;
 
 
@@ -81,7 +81,7 @@ class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
         $this->events = new ArrayCollection();
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }

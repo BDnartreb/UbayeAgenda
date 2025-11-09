@@ -13,6 +13,15 @@
                 <div class="description-card-name"><h2>Organisation Presentation</h2></div>
 
         </div>
+        {# <form method="post" action="{{ path('orga_delete', { id: organisation.id }) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette organisation ?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ organisation.id) }}"> #}
+            <form method="post" action="{{ path('orga_delete') }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette organisation ?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ organisation.id) }}">
+
+    <button class="btn btn-danger">Supprimer</button>
+</form>
+
+
     </div>
 </div>
 {% endblock %}

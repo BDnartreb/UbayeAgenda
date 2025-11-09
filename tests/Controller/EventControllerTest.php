@@ -4,7 +4,7 @@ namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-final class EventControllerTest extends WebTestCase
+final class EventControllerTest extends ControllerTestCase
 {
     public function testIndex(): void
     {
@@ -12,6 +12,7 @@ final class EventControllerTest extends WebTestCase
         $client->request('GET', '/event');
 
         self::assertResponseIsSuccessful();
+        $this->assertSelectorExists('h1'); // exemple
     }
 
 

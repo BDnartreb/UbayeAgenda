@@ -68,6 +68,18 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         $admin->setPassword($this->userPasswordHasher->hashPassword($admin, $_ENV['ADMIN_PASSWORD']));
         $admin->setStatus(StatusEnum::INDIVIDUAL);
 
+        $test = new Organisation();
+        $test->setName("OrgaTest");
+        $test->setAddress("");
+        $test->setTown(TownEnum::A);
+        $test->setEmail('orgatest@email.com');
+        $test->setPhone("");
+        $test->setFirstName("OrgaTest");
+        $test->setLastName("ORGATEST");
+        $test->setRoles(["ROLE_ORGANISATION"]);
+        $test->setPassword($this->userPasswordHasher->hashPassword($test, 'password'));
+        $test->setStatus(StatusEnum::INDIVIDUAL);
+
         $manager->persist($admin);    
 
         // Create Organisations
@@ -76,16 +88,16 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         for ($i = 1; $i < 5; $i++) {
             $orga = new Organisation();
             $orga->setName("Organisation " . $i);
-            $orga->setAddress("1, rue Sésame");
+            $orga->setAddress("$i, rue Sésame");
 
             $randomTown = $townCases[random_int(0,count($townCases)-1)];
             $orga->setTown($randomTown);
 
             $orga->setEmail("orga" . $i . "@email.com");
             $orga->setPhone($faker->phoneNumber());
-            $orga->setFirstName("firstname");
-            $orga->setLastName("lastname");
-            $orga->setRoles(["ROLE_USER"]);
+            $orga->setFirstName("orga" . $i);
+            $orga->setLastName("ORGA" . $i);
+            $orga->setRoles(["ROLE_ORGANISATION"]);
             $orga->setPassword($this->userPasswordHasher->hashPassword($orga, 'password'));
 
             $randomStatus = $statusCases[random_int(0,count($statusCases)-1)];
@@ -101,7 +113,15 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $event->setOrganisation($organisations[random_int(0,count($organisations)-1)]);
             $event->setName("EventName" . $j);
             //$event->setStartDate(new \DateTime());
-            $event->setStartDate($faker->dateTimeBetween('-2 days', '+10 days'));
+            $startDate = $faker->dateTimeBetween('-2 days', '+10 days');
+            $event->setStartDate($startDate);
+
+            if($faker->boolean(50)) {
+                $endDate = (clone $startDate)->modify('+' . $faker->numberBetween(1, 5) . ' hours');
+                $event->setEndDate($endDate);
+            } else{
+                $event->setEndDate(null);
+            }
             $event->setLocation($locations[random_int(0,count($locations)-1)]);    
             $event->setDescription($faker->paragraphs(10, true));
             $event->setPoster($faker->imageUrl(330, 500, 'poster', true));

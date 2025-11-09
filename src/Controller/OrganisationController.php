@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Form\RegisterType;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -42,16 +44,33 @@ final class OrganisationController extends AbstractController
             $this->em->flush();
             $this->addFlash('success', 'Inscription réussie. Vous pouvez vous connecter !');
             
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('logout');
         }
 
-        return $this->render('home/register.html.twig', ['form' => $form]);
+        return $this->render('home/register.html.twig', [
+            'form' => $form,
+            'buttonName' => 'S\'inscrire',
+        ]);
     }
 
-    #[Route('/organisation/update/{id}', name: 'organisation_update')]
-    public function update(Request $request, int $id): Response
+    #[Route('/organisation/update', name: 'organisation_update')]
+    public function update(Request $request): Response
     {
-        $organisation = $this->em->getRepository(Organisation::class)->find($id);
+        /** @var Organisation $organisation */
+        $organisation = $this->getUser();
+
+        // $organisation = $this->em->getRepository(Organisation::class)->find($id);
+
+        if (!$organisation){
+            throw $this->createNotFoundException('Organisation introuvable!');
+        }
+
+        // $currentUser = $this->getUser();
+
+        // if ($currentUser != $organisation) {
+        //     throw $this->createAccessDeniedException('Vous n\'êtes pas authorisé à modifier une autre organisation que la vôtre!');
+        // }
+
         $form = $this->createForm(RegisterType::class, $organisation)->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
@@ -62,76 +81,112 @@ final class OrganisationController extends AbstractController
             $this->em->persist($organisation);
             $this->em->flush();
 
-            return $this->redirectToRoute('login');
+            // return $this->redirectToRoute('organisation', ['id' => $organisation->getId()] );
+            return $this->redirectToRoute('home');
         }
 
         return $this->render('home/register.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'buttonName' => 'Modifier',
         ]);
     }
 
-    #[Route('/organisation/delete/{id}', name: 'admin_orga_delete')]
-    public function delete(): Response
+    #[Route('/organisation/delete', name: 'orga_delete', methods: ['POST'])]
+    public function delete(
+        Request $request,
+        TokenStorageInterface $tokenStorage
+        ): Response
     {
-        return $this->render('organisation/delete.html.twig', [
-            'controller_name' => 'OrganisationController',
-        ]);
+        /** @var Organisation $organisation */
+        $organisation = $this->getUser();
+
+        if (!$organisation){
+            throw $this->createNotFoundException('Organisation introuvable!');
+        }
+
+        // Check CSRF token
+        if (!$this->isCsrfTokenValid('delete'.$organisation->getId(), $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+            return $this->redirectToRoute('home');
+        }
+
+        $currentUser = $tokenStorage->getToken()?->getUser();
+        $isCurrentUser = ($currentUser === $organisation);
+
+        // Logout user if connected
+        if ($isCurrentUser) {
+            $tokenStorage->setToken(null);
+            $request->getSession()->invalidate();
+        }
+
+        $this->em->remove($organisation);
+        $this->em->flush();
+
+        $this->addFlash('success', 'Votre compte a été supprimé avec succès.');
+        
+        return $this->redirectToRoute('home'); // page publique après suppression
     }
 
-    /**
-     * show list of organisations
-     */
-    #[Route('/admin/organisations', name: 'organisations')]
-    public function organisations(): Response
-    {
-        return $this->render('organisation/index.html.twig', [
-            'controller_name' => 'OrganisationController',
-        ]);
-    }
+//     /**
+//      * show list of organisations
+//      */
+//     #[Route('/admin/organisations', name: 'organisations')]
+//     public function organisations(): Response
+//     {
+
+//         return $this->render('organisation/index.html.twig', [
+//             'controller_name' => 'OrganisationController',
+//         ]);
+//     }
 
     /**
      * show organisation page
      */
-    #[Route('/organisation/{id}', name: 'organisation')]
-    public function organisation(int $id): Response
+    //#[Route('/organisation/{id}', name: 'organisation')]
+    //public function organisation(?int $id): Response
+    #[Route('/organisation', name: 'organisation')]
+    public function organisation(): Response
     {
+        $organisation = $this->getUser();
+
+        //dd($organisation);
+        //$organisation = $this->em->getRepository(Organisation::class)->find($id);
+
         return $this->render('organisation/organisation.html.twig', [
             'controller_name' => 'HomeController',
+            'organisation' => $organisation,
         ]);
     }
-
-    // #[Route('/organisation/add', name: 'orga_add')]
-    // public function add(Request $request, EntityManagerInterface $em): Response
-    // {
-    //     $organisation = new Organisation();
-
-    //     $form = $this->createForm(OrganisationType::class, $organisation)->handleRequest($request);
-
-    //     if ($form->isSubmitted() && $form->isValid()) {
-
-    //         $em->persist($organisation);
-    //         $em->flush();
-    //         $this->addFlash('success', 'Votre organisation a bien été enregistrée !');
-
-    //         // Back to the previous page
-    //         $referer = $request->headers->get('referer');
-    //         if ($referer) {
-    //             return $this->redirect($referer);
-    //         }
-
-    //         // Stay on the current page
-    //         return $this->redirectToRoute(
-    //             $request->attributes->get('_route'),
-    //             $request->attributes->get('_route_params')
-    //         );
-    //     }
-
-    //     return $this->render('/user/organisationForm.html.twig', ['form' => $form]);
-    // }
-
-
-
-    
-
-
 }
+
+
+// #[Route('/organisation/delete/{id}', name: 'admin_orga_delete', methods: ['POST'])]
+// public function delete(Request $request, Organisation $organisation, TokenStorageInterface $tokenStorage): Response
+// {
+//     // Vérifie le token CSRF
+//     if (!$this->isCsrfTokenValid('delete'.$organisation->getId(), $request->request->get('_token'))) {
+//         $this->addFlash('error', 'Token CSRF invalide.');
+//         return $this->redirectToRoute('admin_orga_list');
+//     }
+
+//     // Sécurité : autorisation via le voter
+//     $this->denyAccessUnlessGranted('EDIT', $organisation);
+
+//     $currentUser = $tokenStorage->getToken()?->getUser();
+//     $isCurrentUser = ($currentUser === $organisation);
+
+//     // Supprime l'organisation
+//     $this->em->remove($organisation);
+//     $this->em->flush();
+
+//     // Déconnexion si on supprime l'utilisateur connecté
+//     if ($isCurrentUser) {
+//         $tokenStorage->setToken(null);
+//         $request->getSession()->invalidate();
+//         $this->addFlash('success', 'Votre compte a été supprimé.');
+//         return $this->redirectToRoute('app_login');
+//     }
+
+//     $this->addFlash('success', 'Organisation supprimée avec succès.');
+//     return $this->redirectToRoute('admin_orga_list');
+// }

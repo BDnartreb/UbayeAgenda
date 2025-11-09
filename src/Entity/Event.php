@@ -20,7 +20,7 @@ class Event
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\ManyToOne(inversedBy: 'events')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Organisation $organisation;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
@@ -30,6 +30,9 @@ class Event
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private \DateTime $startDate;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTime $endDate = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
@@ -83,7 +86,7 @@ class Event
         return $this;
     }
 
-       public function getStartDate(): ?\DateTime
+    public function getStartDate(): ?\DateTime
     {
         return $this->startDate;
     }
@@ -91,6 +94,18 @@ class Event
     public function setStartDate(\DateTime $startDate): static
     {
         $this->startDate = $startDate;
+
+        return $this;
+    }
+
+    public function getEndDate(): ?\DateTime
+    {
+        return $this->endDate;
+    }
+
+    public function setEndDate(?\DateTime $endDate): static
+    {
+        $this->endDate = $endDate;
 
         return $this;
     }

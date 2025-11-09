@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class HomeController extends AbstractController
 {
     #[Route('/', name: 'home')]
-    public function index(EventRepository $eventRepository,): Response
+    public function index(): Response
     {    
         return $this->redirectToRoute('eventlist');
     }

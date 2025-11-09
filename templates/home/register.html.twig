@@ -29,13 +29,15 @@
                             <div class="mb-3">{{ form_row(form.lastName) }}</div>
                             <div class="mb-3">{{ form_row(form.plainPassword) }}</div>
 
-                            
+                            {% if app.user is null %}
                             <label>
                                 <input type="checkbox" name="charter" required>
                                 J’ai lu <a href="/charter" target="_blank">la charte d'utilisation de ce site</a> et je m'engage à la respecter.
                             </label>
+                            {% endif %}
+
                         </fieldset>
-                        <button class="btn btn-primary" type="submit">S'inscrire</button>
+                        <button class="btn btn-primary" type="submit">{{ buttonName }}</button>
                     {{ form_end(form) }}
                 </div>
             </nav>
