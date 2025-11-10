@@ -28,6 +28,17 @@ class ProdFixtures extends Fixture implements FixtureGroupInterface
         $this->userPasswordHasher = $userPasswordHasher;
     }
 
+    /**
+     * This method must return an array of groups
+     * on which the implementing class belongs to
+     *
+     * @return string[]
+     */
+    public static function getGroups(): array
+    {
+            return ['prod'];
+    }
+
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create('fr_FR');
@@ -49,16 +60,5 @@ class ProdFixtures extends Fixture implements FixtureGroupInterface
         $manager->persist($admin);    
 
         $manager->flush();
-    }
-
-    /**
-     * This method must return an array of groups
-     * on which the implementing class belongs to
-     *
-     * @return string[]
-     */
-    public static function getGroups(): array
-    {
-            return ['prod'];
     }
 }

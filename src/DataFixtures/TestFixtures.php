@@ -17,9 +17,9 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Faker\Factory;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-class AppFixtures extends Fixture implements FixtureGroupInterface
+class TestFixtures extends Fixture implements FixtureGroupInterface
 {
-    private UserPasswordHasherInterface $userPasswordHasher;
+    private $userPasswordHasher;
     private $params;
    
     public function __construct(
@@ -30,7 +30,6 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         $this->userPasswordHasher = $userPasswordHasher;
         $this->params = $params;
     }
-
     
     /**
      * This method must return an array of groups
@@ -40,9 +39,9 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
      */
     public static function getGroups(): array
     {
-            return ['dev'];
+            return ['test'];
     }
-    
+
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create('fr_FR');

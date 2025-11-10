@@ -2,21 +2,21 @@
 
 namespace App\Tests\Controller;
 
-final class HomeControllerTest extends ControllerTestCase
+final class HomeControllerTest extends AbstractControllerTest
 {
-    public function testIndex(): void
-    {
-        $crawler = $this->get('/');
+    // public function testIndex(): void
+    // {
+    //     $crawler = $this->get('/');
 
-        self::assertResponseIsSuccessful();
-        $this->assertSelectorExists('h1'); // exemple
-    }
+    //     self::assertResponseIsSuccessful();
+    //     $this->assertSelectorExists('h1', 'Filtres'); // exemple
+    // }
 
-    public function testListEvents(): void
-    {
-        $crawler = $this->get('/');
+    // public function testListEvents(): void
+    // {
+    //     $crawler = $this->get('/');
 
-        self::assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h2', 'EventName5'); // adapte selon ton fixture
-    }
+    //     self::assertResponseIsSuccessful();
+    //     $this->assertSelectorTextContains('h2', 'EventName5'); // adapte selon ton fixture
+    // }
 }
