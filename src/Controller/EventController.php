@@ -24,7 +24,7 @@ final class EventController extends AbstractController
     }
 
 
-    #[Route('/event/{id}', name: 'event')]
+    #[Route('/event/event/{id}', name: 'event')]
     public function event(Event $event): Response
     {
         return $this->render('event/event.html.twig', [
@@ -33,14 +33,17 @@ final class EventController extends AbstractController
     }
 
     // User and admin
-    #[Route('/user/event/add', name: 'event_add', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    #[Route('/organisation/event/add', name: 'event_add', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function add(Request $request, EntityManagerInterface $em): Response
     {
         $event = new Event();
         $form = $this->createForm(EventType::class, $event)->handleRequest($request);
 
+        $organisation = $this->getUser();
+
         if ($form->isSubmitted() && $form->isValid())
         {
+            $event->setOrganisation($organisation);
             $em->persist($event);
             $em->flush();
 
@@ -49,12 +52,12 @@ final class EventController extends AbstractController
             return $this->redirectToRoute('event', ['id' => $event->getId()]);
         }
 
-        return $this->render('user/eventForm.html.twig', ['form' => $form]);
+        return $this->render('organisation/eventForm.html.twig', ['form' => $form]);
     }
 
     // User on his own event
     // admin for all events
-    #[Route('/user/event/update/{id}', name: 'event_update')]
+    #[Route('/organisation/event/update/{id}', name: 'event_update')]
     public function update(int $id, EventRepository $eventRepository, Request $request, EntityManagerInterface $em): Response
     {
         $event = $eventRepository->find($id);
@@ -77,7 +80,7 @@ final class EventController extends AbstractController
 
     // User for his own event
     // admin for all events
-    #[Route('/user/event/delete/{id}', name: 'event_delete')]
+    #[Route('/organisation/event/delete/{id}', name: 'event_delete')]
     public function delete(int $id, EventRepository $eventRepository, EntityManagerInterface $em): Response
     {
         $event = $eventRepository->find($id);
@@ -91,10 +94,10 @@ final class EventController extends AbstractController
     /**
      * Show list of events proposed by one or several organisations the user is member of
      */
-    #[Route('/user/events', name: 'user_events')]
+    #[Route('/organisation/events', name: 'organisation_events')]
     public function userEvents(): Response
     {
-        return $this->render('user/user_events.html.twig', [
+        return $this->render('organisation/organisation_events.html.twig', [
             'controller_name' => 'EventController',
         ]);
     }

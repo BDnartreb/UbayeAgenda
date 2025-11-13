@@ -24,12 +24,12 @@ class Event
     private Organisation $organisation;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
-    #[ORM\Column(length: 255)]
-    private string $name;
+    #[ORM\Column(length: 255, nullable: false)]
+    private ?string $name = null;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private \DateTime $startDate;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: false)]
+    private ?\DateTime $startDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $endDate = null;
@@ -182,12 +182,12 @@ class Event
         return $this;
     }
 
-    public function getLocation(): Location
+    public function getLocation(): ?Location
     {
         return $this->location;
     }
 
-    public function setLocation(Location $location): static
+    public function setLocation(?Location $location): static
     {
         $this->location = $location;
 

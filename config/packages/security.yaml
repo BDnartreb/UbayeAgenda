@@ -39,7 +39,7 @@ security:
     role_hierarchy:
         ROLE_FROZEN: ~
         ROLE_ORGANISATION:
-        ROLE_ADMIN: ROLE_ORGANISATION
+        ROLE_ADMIN:
     
     
     access_control:

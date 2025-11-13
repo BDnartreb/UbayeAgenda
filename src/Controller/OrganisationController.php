@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Event;
 use App\Entity\Organisation;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -9,6 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Form\RegisterType;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -38,10 +41,14 @@ final class OrganisationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $plainPassword = $form->get('plainPassword')->getData();
-            $organisation->setPassword($this->userPasswordHasher->hashPassword($organisation, $plainPassword));
+            if ($plainPassword !== null && $plainPassword !== '') {
+                $organisation->setPassword($this->userPasswordHasher->hashPassword($organisation, $plainPassword));
+            }         
             $organisation->setRoles(['ROLE_USER']);
+
             $this->em->persist($organisation);
             $this->em->flush();
+            
             $this->addFlash('success', 'Inscription réussie. Vous pouvez vous connecter !');
             
             return $this->redirectToRoute('logout');
@@ -53,23 +60,15 @@ final class OrganisationController extends AbstractController
         ]);
     }
 
-    #[Route('/organisation/update', name: 'organisation_update')]
+    #[Route('/organisation/update', name: 'organisation_update', methods: ['GET', 'POST'])]
     public function update(Request $request): Response
     {
         /** @var Organisation $organisation */
         $organisation = $this->getUser();
 
-        // $organisation = $this->em->getRepository(Organisation::class)->find($id);
-
         if (!$organisation){
             throw $this->createNotFoundException('Organisation introuvable!');
         }
-
-        // $currentUser = $this->getUser();
-
-        // if ($currentUser != $organisation) {
-        //     throw $this->createAccessDeniedException('Vous n\'êtes pas authorisé à modifier une autre organisation que la vôtre!');
-        // }
 
         $form = $this->createForm(RegisterType::class, $organisation)->handleRequest($request);
 
@@ -81,7 +80,6 @@ final class OrganisationController extends AbstractController
             $this->em->persist($organisation);
             $this->em->flush();
 
-            // return $this->redirectToRoute('organisation', ['id' => $organisation->getId()] );
             return $this->redirectToRoute('home');
         }
 
@@ -127,27 +125,15 @@ final class OrganisationController extends AbstractController
         return $this->redirectToRoute('home'); // page publique après suppression
     }
 
-//     /**
-//      * show list of organisations
-//      */
-//     #[Route('/admin/organisations', name: 'organisations')]
-//     public function organisations(): Response
-//     {
-
-//         return $this->render('organisation/index.html.twig', [
-//             'controller_name' => 'OrganisationController',
-//         ]);
-//     }
-
     /**
      * show organisation page
      */
-    //#[Route('/organisation/{id}', name: 'organisation')]
-    //public function organisation(?int $id): Response
     #[Route('/organisation', name: 'organisation')]
     public function organisation(): Response
     {
+        /** @var \App\Entity\Organisation $organisation */
         $organisation = $this->getUser();
+        $events = $this->em->getRepository(Event::class)->findBy(['organisation' => $organisation->getId()]);
 
         //dd($organisation);
         //$organisation = $this->em->getRepository(Organisation::class)->find($id);
@@ -155,6 +141,38 @@ final class OrganisationController extends AbstractController
         return $this->render('organisation/organisation.html.twig', [
             'controller_name' => 'HomeController',
             'organisation' => $organisation,
+            'events' => $events,
+        ]);
+    }
+
+
+
+        /**
+     * show list of organisations
+     */
+    #[Route('/admin/organisations', name: 'admin_organisations')]
+    public function organisations(): Response
+    {
+        $organisations = $this->em->getRepository(Organisation::class)->findByRole('ROLE_ORGANISATION');
+
+        return $this->render('admin/organisations.html.twig', [
+            'controller_name' => 'OrganisationController',
+             'organisations' => $organisations,
+        ]);
+    }
+
+       /**
+     * show list of organisations
+     */
+    #[Route('/admin/events', name: 'admin_events')]
+    public function events(): Response
+    {
+        $events = $this->em->getRepository(Event::class)->findAll();
+        
+        return $this->render('/admin/events.html.twig', [
+            'controller_name' => 'OrganisationController',
+            'events' => $events,
+
         ]);
     }
 }

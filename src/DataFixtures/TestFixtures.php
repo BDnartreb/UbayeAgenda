@@ -71,7 +71,7 @@ class TestFixtures extends Fixture implements FixtureGroupInterface
         // Create Admin
    
         $admin = new Organisation();
-        $admin->setName("AdminDev");
+        $admin->setName("AdminTest");
         $admin->setAddress("");
         $admin->setTown(TownEnum::A);
         //$admin->setEmail($_ENV['ADMIN_EMAIL']);
@@ -86,73 +86,71 @@ class TestFixtures extends Fixture implements FixtureGroupInterface
         
         $manager->persist($admin); 
 
-        $test = new Organisation();
-        $test->setName("OrgaTest");
-        $test->setAddress("");
-        $test->setTown(TownEnum::A);
-        $test->setEmail('orgatest@email.com');
-        $test->setPhone("");
-        $test->setFirstName("OrgaTest");
-        $test->setLastName("ORGATEST");
-        $test->setRoles(["ROLE_ORGANISATION"]);
-        $test->setPassword($this->userPasswordHasher->hashPassword($test, 'password'));
-        $test->setStatus(StatusEnum::INDIVIDUAL);
+        $orgaTest = new Organisation();
+        $orgaTest->setName("OrgaTest");
+        $orgaTest->setAddress("");
+        $orgaTest->setTown(TownEnum::A);
+        $orgaTest->setEmail('orgatest@email.com');
+        $orgaTest->setPhone("");
+        $orgaTest->setFirstName("OrgaTest");
+        $orgaTest->setLastName("ORGATEST");
+        $orgaTest->setRoles(["ROLE_ORGANISATION"]);
+        $orgaTest->setPassword($this->userPasswordHasher->hashPassword($orgaTest, 'password'));
+        $orgaTest->setStatus(StatusEnum::INDIVIDUAL);
 
-        $manager->persist($test);    
+        $manager->persist($orgaTest);    
 
-        // Create Organisations
-        $organisations = [];
+        $orgaToDelete = new Organisation();
+        $orgaToDelete->setName("OrgaToDelete");
+        $orgaToDelete->setAddress("");
+        $orgaToDelete->setTown(TownEnum::A);
+        $orgaToDelete->setEmail('orgatodelete@email.com');
+        $orgaToDelete->setPhone("");
+        $orgaToDelete->setFirstName("OrgaToDelete");
+        $orgaToDelete->setLastName("ORGATODELETE");
+        $orgaToDelete->setRoles(["ROLE_ORGANISATION"]);
+        $orgaToDelete->setPassword($this->userPasswordHasher->hashPassword($orgaToDelete, 'password'));
+        $orgaToDelete->setStatus($statusCases[random_int(0,count($statusCases)-1)]);
 
-        for ($i = 1; $i < 5; $i++) {
-            $orga = new Organisation();
-            $orga->setName("Organisation " . $i);
-            $orga->setAddress("$i, rue Sésame");
+        $manager->persist($orgaToDelete);  
 
-            $randomTown = $townCases[random_int(0,count($townCases)-1)];
-            $orga->setTown($randomTown);
 
-            $orga->setEmail("orga" . $i . "@email.com");
-            $orga->setPhone($faker->phoneNumber());
-            $orga->setFirstName("orga" . $i);
-            $orga->setLastName("ORGA" . $i);
-            $orga->setRoles(["ROLE_ORGANISATION"]);
-            $orga->setPassword($this->userPasswordHasher->hashPassword($orga, 'password'));
-
-            $randomStatus = $statusCases[random_int(0,count($statusCases)-1)];
-            $orga->setStatus($randomStatus);
-            
-            $manager->persist($orga);
-            $organisations[] = $orga;
-        }
-
-        // Create Events
-        for ($j=1; $j < 20; $j++) {
+        // Create Events for orgaTest
+        for ($i=1; $i < 5; $i++) {
             $event = new Event();
-            $event->setOrganisation($organisations[random_int(0,count($organisations)-1)]);
-            $event->setName("EventName" . $j);
-            //$event->setStartDate(new \DateTime());
-            $startDate = $faker->dateTimeBetween('-2 days', '+10 days');
+            $event->setOrganisation($orgaTest);
+            $event->setName("EventTestName" . $i);
+                $startDate = $faker->dateTimeBetween('-2 days', '+10 days');
             $event->setStartDate($startDate);
-
-            if($faker->boolean(50)) {
                 $endDate = (clone $startDate)->modify('+' . $faker->numberBetween(1, 5) . ' hours');
-                $event->setEndDate($endDate);
-            } else{
-                $event->setEndDate(null);
-            }
+            $event->setEndDate($endDate);
             $event->setLocation($locations[random_int(0,count($locations)-1)]);    
             $event->setDescription($faker->paragraphs(10, true));
             $event->setPoster($faker->imageUrl(330, 500, 'poster', true));
             $event->setComment($faker->paragraphs(10, true));
+            $event->setFee($feeCases[random_int(0, count($feeCases)-1)]);
+            $event->setThematic($thematicCases[random_int(0, count($thematicCases)-1)]);
+            $event->setPublic($publicCases[random_int(0, count($publicCases)-1)]);
             
-            $randomFee = $feeCases[random_int(0, count($feeCases)-1)];
-            $event->setFee($randomFee);
+            $manager->persist($event);
+        }
 
-            $randomThematic = $thematicCases[random_int(0, count($thematicCases)-1)];
-            $event->setThematic($randomThematic);
-
-            $randomPublic = $publicCases[random_int(0, count($publicCases)-1)];
-            $event->setPublic($randomPublic);
+        // Create Events for orgaToDelete
+        for ($j=1; $j < 5; $j++) { 
+            $event = new Event();
+            $event->setOrganisation($orgaToDelete);
+            $event->setName("EventToDeleteName" . $j);
+                $startDate = $faker->dateTimeBetween('-2 days', '+10 days');
+            $event->setStartDate($startDate);
+                $endDate = (clone $startDate)->modify('+' . $faker->numberBetween(1, 5) . ' hours');
+            $event->setEndDate($endDate);
+            $event->setLocation($locations[random_int(0,count($locations)-1)]);    
+            $event->setDescription($faker->paragraphs(10, true));
+            $event->setPoster($faker->imageUrl(330, 500, 'poster', true));
+            $event->setComment($faker->paragraphs(10, true));
+            $event->setFee($feeCases[random_int(0, count($feeCases)-1)]);
+            $event->setThematic($thematicCases[random_int(0, count($thematicCases)-1)]);
+            $event->setPublic($publicCases[random_int(0, count($publicCases)-1)]);
             
             $manager->persist($event);
         }

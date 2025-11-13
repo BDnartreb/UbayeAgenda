@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 final class SecurityControllerTest extends AbstractControllerTest
 {
@@ -43,11 +44,34 @@ final class SecurityControllerTest extends AbstractControllerTest
         $this->assertSame('orgatest@email.com', $token->getUserIdentifier());
     }
 
-    // public function testIndex(): void
-    // {
-    //     $client = static::createClient();
-    //     $client->request('GET', '/security');
+    /**
+    * 
+    * @dataProvider provideBadConnectionParams
+    */
+     public function testLoginShouldFailed(string $email, string $password):void
+    {
+        $crawler = $this->client->request('GET', '/login');
+                $form = $crawler->selectButton('Connexion')->form([
+            '_username' => $email,
+            '_password' => $password,
+        ]);
 
-    //     self::assertResponseIsSuccessful();
-    // }
+        $this->client->submit($form);
+        $authorizationChecker = self::getContainer()->get(AuthorizationCheckerInterface::class);
+        self::assertFalse($authorizationChecker->isGranted('IS_AUTHENTICATED'));
+        $this->assertResponseRedirects('/login');
+        $this->client->followRedirect();
+    }
+
+    /**
+     * @return array<array{string, string}>
+     */
+    
+    public function provideBadConnectionParams(){
+        return [
+            ["baduser@email.com", "password"],
+            ["orgatest@email.com", "badpassword"],
+        ];
+    }
+
 }

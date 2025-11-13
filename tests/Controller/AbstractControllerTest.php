@@ -6,6 +6,7 @@ use App\Entity\Organisation;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -14,19 +15,24 @@ abstract class AbstractControllerTest extends WebTestCase
     protected KernelBrowser $client;
     protected EntityManagerInterface $em;
     protected ParameterBagInterface $params;
+    protected ?ContainerInterface $container = null;
     private array $entitiesToRemove = [];
 
     protected function setUp(): void
     {
         //parent::setUp();
         self::ensureKernelShutdown(); // shutdown the kernel before creating a new client
-        $this->client = static::createClient();
-        $this->em = $this->client->getContainer()->get(EntityManagerInterface::class);
+        // $this->client = static::createClient();
+        // $this->container = static::getContainer();
+        // $this->em = $this->client->getContainer()->get(EntityManagerInterface::class);
 
+                $this->client = static::createClient();
+        $this->container = $this->client->getContainer();
+        $this->em = $this->container->get('doctrine')->getManager();
 
-        // Accès aux paramètres et services depuis le conteneur
-        $container = static::getContainer();
-        $this->params = $container->get(ParameterBagInterface::class);
+        $this->client->catchExceptions(false);
+
+        $this->params = $this->container->get(ParameterBagInterface::class);
     }
 
     /**

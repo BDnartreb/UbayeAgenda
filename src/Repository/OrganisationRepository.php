@@ -33,6 +33,33 @@ class OrganisationRepository extends ServiceEntityRepository implements Password
         $this->getEntityManager()->flush();
     }
 
+    public function findByRole(string $role): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT id FROM organisation
+            WHERE roles::jsonb @> :roleJson
+        ';
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue('roleJson', json_encode([$role]));
+        $result = $stmt->executeQuery()->fetchFirstColumn();
+
+        if (empty($result)) {
+            return [];
+        }
+
+        // Recharge les entités Doctrine correspondantes à ces IDs
+        return $this->createQueryBuilder('o')
+            ->where('o.id IN (:ids)')
+            ->setParameter('ids', $result)
+            ->getQuery()
+            ->getResult();
+    }
+
+
+
     //    /**
     //     * @return Organisation[] Returns an array of Organisation objects
     //     */

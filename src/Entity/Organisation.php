@@ -11,10 +11,15 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: OrganisationRepository::class)]
 #[ORM\Table(name: '`organisation`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[UniqueEntity(
+    fields: ['email'],
+    message: 'Cet email est déjà utilisé.'
+)]
 class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -22,13 +27,13 @@ class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Assert\NotBlank()]
-    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
+    #[ORM\Column(length: 255, nullable: false)]
     private ?string $name = null;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(length: 255, nullable: false)]
-    private string $address = '';
+    private ?string $address = null;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(enumType: TownEnum::class)]
@@ -37,12 +42,12 @@ class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[Assert\Email(message: "L'Email que vous avez renseigné n'est pas valide")]
     #[ORM\Column(length: 255, nullable: false)]
-    private string $email = '';
+    private ?string $email = null;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(length: 30, nullable: false)]
     #[Assert\Regex(pattern: '/^\+?[0-9\s\-().]{6,20}$/', message: 'Le numéro de téléphone n\'est pas valide.')]
-    private string $phone = '';
+    private ?string $phone = null;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(enumType: StatusEnum::class)]
@@ -50,11 +55,11 @@ class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(length: 255, nullable: false)]
-    private ?string $firstName = '';
+    private ?string $firstName = null;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(length: 255, nullable: false)]
-    private ?string $lastName = '';
+    private ?string $lastName = null;
 
     /**
      * @var string The hashed password
@@ -86,7 +91,7 @@ class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -98,7 +103,7 @@ class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getAddress(): string
+    public function getAddress(): ?string
     {
         return $this->address;
     }
@@ -122,7 +127,7 @@ class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -134,7 +139,7 @@ class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPhone(): string
+    public function getPhone(): ?string
     {
         return $this->phone;
     }

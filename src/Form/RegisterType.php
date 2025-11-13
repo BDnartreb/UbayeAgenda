@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Enum\StatusEnum;
 use App\Enum\TownEnum;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class RegisterType extends AbstractType
 {
@@ -43,6 +44,11 @@ class RegisterType extends AbstractType
                 'label' => "Mot de passe",
                 'required' => true,
                 'mapped' => false,
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Ce champ doit être renseigné',
+                    ]),
+                ],
             ])          
             
             

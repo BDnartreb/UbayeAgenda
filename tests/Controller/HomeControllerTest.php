@@ -4,19 +4,33 @@ namespace App\Tests\Controller;
 
 final class HomeControllerTest extends AbstractControllerTest
 {
-    // public function testIndex(): void
-    // {
-    //     $crawler = $this->get('/');
 
-    //     self::assertResponseIsSuccessful();
-    //     $this->assertSelectorExists('h1', 'Filtres'); // exemple
-    // }
+    public function testDisplayOfEventListPage():void
+    {
+        $this->client->request('GET','/');
+        $this->assertResponseRedirects('/eventlist');
+        $this->client->followRedirect();
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('.day-container');
+    }
 
-    // public function testListEvents(): void
-    // {
-    //     $crawler = $this->get('/');
+    public function testDisplayOfPostersPage():void
+    {
+        $this->client->request('GET','/posters');
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('.event-poster');
+    }
 
-    //     self::assertResponseIsSuccessful();
-    //     $this->assertSelectorTextContains('h2', 'EventName5'); // adapte selon ton fixture
-    // }
+    public function testDisplayOfContactPage():void
+    {
+        $this->client->request('GET','/contact');
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testDisplayOfCharterPage():void
+    {
+        $this->client->request('GET','/charter');
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('h1', 'Charte d\'utilisation du site');
+    }
 }

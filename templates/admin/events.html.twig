@@ -7,11 +7,13 @@
         <div class="left-container">Filtres</div>
         <div class="agenda-container">
             <div class="day-container">
+                {% for event in events %}
                 <div class="day">
                     <div class="day-before"><h1><i class="fa-solid fa-caret-left"></i></h1></div>
-                    <div class="day"><h1>Mardi 23 septembre 2025</h1></div>
+                    <div class="event_name"><h1> {{ event.name }} </h1></div>
                     <div class="day-after"><h1><i class="fa-solid fa-caret-right"></i></h1></div>
                 </div>
+                {% endfor %}
                 <div class="events">
                     <div class="event-card">
                         <div class="event-poster">

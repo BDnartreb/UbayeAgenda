@@ -10,7 +10,7 @@
             <img src="{{ asset('images/poster.jpg') }}" alt="Affiche de l'événement">
         </div>
         <div class="event-description-card">
-                <div class="description-card-name"><h2>{{ event.name }}</h2></div>
+                <div class="description-card-name"><h1>{{ event.name }}</h2></div>
                 <div class="description-card-time-location"><h2>{{ event.startDate|date('l j F Y - H:i') }}</h2></div>
                 <div class="description-card-time-location"><h2>{{ event.location.name }} - {{ event.location.town.value }}</h2></div>
                 <div class="description-card-organizer"><h3>Présenté par : {{ event.organisation.name }}</h3></div>

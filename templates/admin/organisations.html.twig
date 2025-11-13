@@ -7,11 +7,13 @@
         <div class="left-container">Filtres</div>
         <div class="agenda-container">
             <div class="day-container">
+                {% for organisation in organisations %}
                 <div class="day">
                     <div class="day-before"><h1><i class="fa-solid fa-caret-left"></i></h1></div>
-                    <div class="day"><h1>Liste des organisations</h1></div>
+                    <div class="orga_name"><h1> {{ organisation.name }} </h1></div>
                     <div class="day-after"><h1><i class="fa-solid fa-caret-right"></i></h1></div>
                 </div>
+                {% endfor %}
                 <div class="events">
                     <div class="event-card">
                         <div class="event-poster">
