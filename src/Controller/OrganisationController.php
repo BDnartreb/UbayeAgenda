@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Event;
+use App\Entity\Location;
 use App\Entity\Organisation;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -10,13 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Form\RegisterType;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Symfony\Component\Form\FormError;
+use App\Form\LocationType;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 
 final class OrganisationController extends AbstractController
 {
@@ -44,7 +42,7 @@ final class OrganisationController extends AbstractController
             if ($plainPassword !== null && $plainPassword !== '') {
                 $organisation->setPassword($this->userPasswordHasher->hashPassword($organisation, $plainPassword));
             }         
-            $organisation->setRoles(['ROLE_USER']);
+            $organisation->setRoles(['ROLE_ORGANISATION']);
 
             $this->em->persist($organisation);
             $this->em->flush();
@@ -89,7 +87,7 @@ final class OrganisationController extends AbstractController
         ]);
     }
 
-    #[Route('/organisation/delete', name: 'orga_delete', methods: ['POST'])]
+    #[Route('/organisation/delete', name: 'organisation_delete', methods: ['POST'])]
     public function delete(
         Request $request,
         TokenStorageInterface $tokenStorage
@@ -122,7 +120,76 @@ final class OrganisationController extends AbstractController
 
         $this->addFlash('success', 'Votre compte a été supprimé avec succès.');
         
-        return $this->redirectToRoute('home'); // page publique après suppression
+        return $this->redirectToRoute('home');
+    }
+
+    #[Route('/admin/organisation/update/{id}', name: 'admin_organisation_update', methods: ['GET', 'POST'])]
+    public function admin_update(Request $request, int $id): Response
+    {
+        /** @var Organisation $organisation */
+        $admin = $this->getUser();
+
+        if (!$admin){
+            throw $this->createNotFoundException('Admin introuvable!');
+        }
+
+        $organisation = $this->em->getRepository(Organisation::class)->find($id);
+
+        $form = $this->createForm(RegisterType::class, $organisation)->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            $plainPassword = $form->get('plainPassword')->getData();
+            if(!empty($plainPassword)){
+                $organisation->setPassword($this->userPasswordHasher->hashPassword($organisation, $plainPassword));
+            }
+            $this->em->persist($organisation);
+            $this->em->flush();
+
+            return $this->redirectToRoute('home');
+        }
+
+        return $this->render('home/register.html.twig', [
+            'form' => $form->createView(),
+            'buttonName' => 'Modifier',
+        ]);
+    }
+
+
+    #[Route('/admin/organisation/delete/{id}', name: 'admin_organisation_delete', methods: ['GET', 'POST'])]
+    public function admin_delete(int $id): Response
+    {
+        /** @var Organisation $organisation */
+        $admin = $this->getUser();
+
+        if (!$admin){
+            throw $this->createNotFoundException('Admin introuvable!');
+        }
+
+        $organisation = $this->em->getRepository(Organisation::class)->find($id);
+        $this->em->remove($organisation);
+        $this->em->flush();
+
+        return $this->redirectToRoute('admin_organisations');
+    }
+   
+    #[Route('/organisation/location/add', name: 'organisation_location_add', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function organisationLocationAdd(Request $request): Response
+    {
+        $location = new Location();
+        $form = $this->createForm(LocationType::class, $location);
+        $form->handleRequest($request);  
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $this->em->persist($location);
+            $this->em->flush();
+
+            $this->addFlash('success', 'Lieu créé avec succès !');
+
+            return $this->redirectToRoute('home');
+        }
+
+        return $this->render('/organisation/locationForm.html.twig', ['form' => $form]);
     }
 
     /**
@@ -139,13 +206,10 @@ final class OrganisationController extends AbstractController
         //$organisation = $this->em->getRepository(Organisation::class)->find($id);
 
         return $this->render('organisation/organisation.html.twig', [
-            'controller_name' => 'HomeController',
             'organisation' => $organisation,
             'events' => $events,
         ]);
     }
-
-
 
         /**
      * show list of organisations

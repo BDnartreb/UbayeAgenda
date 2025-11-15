@@ -12,11 +12,20 @@
                         </li> 
 
                         <li class="navbar-item">
-                            {% if app.user %}
-                                <a href="{{ path('logout') }}" class="nav-link">Déconnexion</a>
-                            {% else %}
+                            {% if app.user is null %}
                                 <a href="{{ path('login') }}" class="nav-link">Connexion</a>
                             {% endif %}
+                            {% if is_granted('ROLE_ORGANISATION') %}
+                                <a href="{{ path('organisation') }}" class="nav-link">Organisation</a>
+                                <a href="{{ path('organisation_event_add') }}" class="nav-link">Créer un événement</a>
+                                <a href="{{ path('logout') }}" class="nav-link">Déconnexion</a>
+                            {% endif %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <a href="{{ path('admin_organisations') }}" class="nav-link">Organisations</a>
+                                <a href="{{ path('admin_events') }}" class="nav-link">Evénements</a>
+                                <a href="{{ path('logout') }}" class="nav-link">Déconnexion</a>
+                            {% endif %}
+
                         </li> 
                     </ul>
                 </div>

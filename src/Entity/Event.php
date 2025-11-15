@@ -27,7 +27,7 @@ class Event
     #[ORM\Column(length: 255, nullable: false)]
     private ?string $name = null;
 
-    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
+    #[Assert\NotNull(message: "Ce champ doit être renseigné")]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: false)]
     private ?\DateTime $startDate = null;
 
@@ -40,16 +40,19 @@ class Event
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $poster = null;
 
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(enumType: FeeEnum::class)]
     private ?FeeEnum $fee = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
 
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(enumType: ThematicEnum::class)]
     private ?ThematicEnum $thematic = null;
 
-     #[ORM\Column(enumType: PublicEnum::class)]
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
+    #[ORM\Column(enumType: PublicEnum::class)]
     private ?PublicEnum $public = null;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
@@ -91,7 +94,7 @@ class Event
         return $this->startDate;
     }
 
-    public function setStartDate(\DateTime $startDate): static
+    public function setStartDate(?\DateTime $startDate): static
     {
         $this->startDate = $startDate;
 

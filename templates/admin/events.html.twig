@@ -9,9 +9,13 @@
             <div class="day-container">
                 {% for event in events %}
                 <div class="day">
-                    <div class="day-before"><h1><i class="fa-solid fa-caret-left"></i></h1></div>
                     <div class="event_name"><h1> {{ event.name }} </h1></div>
-                    <div class="day-after"><h1><i class="fa-solid fa-caret-right"></i></h1></div>
+                    <a href="{{ path('event', {'id': event.id}) }}">Voir</a>
+                    <a href="{{ path('admin_event_update', {'id': event.id}) }}">Modifier</a>
+                    <form method="post" action="{{ path('admin_event_delete', {'id': event.id}) }}" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer cette organisation ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
+                        <button type="submit" class="btn-link">Supprimer</button>
+                    </form>
                 </div>
                 {% endfor %}
                 <div class="events">

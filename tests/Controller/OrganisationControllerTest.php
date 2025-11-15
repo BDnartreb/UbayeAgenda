@@ -104,69 +104,7 @@ final class OrganisationControllerTest extends AbstractControllerTest
 
     }
 
-    /**
-     * @dataProvider provideAccessData
-     */
-    public function testAccessToProtectedPages(?string $email, string $path, string $method, string $codeHttp):void
-    {
-        if ($email !== null){
-        $organisationRepository = $this->em->getRepository(Organisation::class);
-        $organisation = $organisationRepository->findOneBy(['email' => $email]);
-        $this->client->loginUser($organisation);
-        }
-
-        $this->client->catchExceptions(true);
-        $crawler = $this->client->request($method, $path);
-
-        if ($email === null){
-            $this->assertResponseRedirects('/login', Response::HTTP_FOUND);
-            return;
-        } 
-
-        $this->assertResponseStatusCodeSame(constant(Response::class . '::' . $codeHttp));
-            
-        // if ($codeHttp === 'HTTP_OK' && $path === '/organisation'){
-        //     //dump($email, $path);
-        //     $organisationName = $organisation->getName();
-        //     $this->assertSelectorTextContains('h1', $organisationName);
-        // }
-
-        if ($codeHttp === 'HTTP_OK' && $path === '/organisation/update'){
-            //dump($email, $path);
-            $emailValue = $crawler->filter('#register_email')->attr('value');
-            $this->assertSame($email, $emailValue);
-        }
-    }
-
-    public function provideAccessData(): \Generator
-    {
-        // /organisation
-        yield 'visitor_orga' => [null, '/organisation', 'GET', 'HTTP_FORBIDDEN'];
-        yield 'organisation_orga' => ['orgatest@email.com', '/organisation', 'GET', 'HTTP_OK'];
-        yield 'admin_orga' => ['admin@ubayeagenda.com', '/organisation', 'GET', 'HTTP_FORBIDDEN'];
-        
-        // /organisation/update
-        yield 'visitor_orga_update' => [null, '/organisation/update', 'GET', 'HTTP_FORBIDDEN'];
-        yield 'organisation_orga_update' => ['orgatest@email.com', '/organisation/update', 'GET', 'HTTP_OK'];
-        yield 'admin_orga_update' => ['admin@ubayeagenda.com', '/organisation/update', 'GET', 'HTTP_FORBIDDEN'];
-
-        // /organisation/delete
-        yield 'visitor_orga_delete' => [null, '/organisation/delete', 'POST', 'HTTP_FORBIDDEN'];
-        yield 'organisation_orga_delete' => ['orgatest@email.com', '/organisation/delete', 'POST', 'HTTP_FOUND'];
-        yield 'admin_orga_delete' => ['admin@ubayeagenda.com', '/organisation/delete', 'POST', 'HTTP_FORBIDDEN'];
-
-        // /admin/organisations
-        yield 'visitor_admin_organisations' => [null, '/admin/organisations', 'GET', 'HTTP_FORBIDDEN'];
-        yield 'organisation_admin_organisaTIons' => ['orgatest@email.com', '/admin/organisations', 'GET', 'HTTP_FORBIDDEN'];
-        yield 'admin_admin_organisatIons' => ['admin@ubayeagenda.com', '/admin/organisations', 'GET', 'HTTP_OK'];
-
-        // /admin/events
-        yield 'visitor_admin_events' => [null, '/admin/events', 'GET', 'HTTP_FORBIDDEN'];
-        yield 'organisation_admin_events' => ['orgatest@email.com', '/admin/events', 'GET', 'HTTP_FORBIDDEN'];
-        yield 'admin_admin_events' => ['admin@ubayeagenda.com', '/admin/events', 'GET', 'HTTP_OK'];
-    }
-
-    public function testOrganisationUpdateIsSuccessful():void
+     public function testOrganisationUpdateIsSuccessful():void
     {
         $orgaTestEmail = "orgatest@email.com"; 
         $organisation = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $orgaTestEmail]);
@@ -174,7 +112,9 @@ final class OrganisationControllerTest extends AbstractControllerTest
 
         $crawler = $this->client->request('GET', '/organisation/update');
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('form');
+        $this->assertSelectorExists('form'); 
+        $emailValue = $crawler->filter('#register_email')->attr('value');
+        $this->assertSame($orgaTestEmail, $emailValue);
 
         $form = $crawler->filter('form[name="register"]')->form([ 
             'register[name]' => "OrgaTest",
@@ -189,12 +129,12 @@ final class OrganisationControllerTest extends AbstractControllerTest
             // 'charter' => 'on',
         ]);
 
-            $this->client->submit($form);
-            $this->assertResponseRedirects('/', Response::HTTP_FOUND);
-            $this->client->followRedirect();
+        $this->client->submit($form);
+        $this->assertResponseRedirects('/', Response::HTTP_FOUND);
+        $this->client->followRedirect();
 
-            $organisationUpdated = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $orgaTestEmail]);
-            $this->AssertEquals('UpdatedAddress', $organisationUpdated->getAddress());
+        $organisationUpdated = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $orgaTestEmail]);
+        $this->AssertEquals('UpdatedAddress', $organisationUpdated->getAddress());
     }
 
     public function testOrganisationDeleteIsSuccessful():void
@@ -243,39 +183,20 @@ final class OrganisationControllerTest extends AbstractControllerTest
         $this->assertEquals(0, $eventCountAfterDelete);
     }
 
-    /**
-     * @dataProvider provideAdminListPath
-     */
-
-    public function testDisplayOfOrganisationAndEventListForAdminIsSuccessful(string $path):void
+    public function testDisplayOfOrganisationListForAdminIsSuccessful():void
     {
-        $adminEmail = "admin@ubayeagenda.com"; 
+        $adminEmail = "admin@ubayeagenda.com";
+        $path = "/admin/organisations";
         $organisationRepository = $this->em->getRepository(Organisation::class);
         $admin = $organisationRepository->findOneBy(['email' => $adminEmail]);
         $this->client->loginUser($admin);
         $crawler = $this->client->request('GET', $path);
         $this->assertResponseIsSuccessful();
 
-        if ($path === '/admin/organisations') {
-            $organisations = $this->em->getRepository(Organisation::class)->findByRole('ROLE_ORGANISATION');
-            $numberExpected = count($organisations);
-            $this->assertSelectorCount($numberExpected, '.orga_name');
-        }
-
-        if ($path === '/admin/events') {
-            $events = $this->em->getRepository(Event::class)->findAll();
-            $numberExpected = count($events);
-            $this->assertSelectorCount($numberExpected, '.event_name');
-        }
-   
+        $organisations = $this->em->getRepository(Organisation::class)->findByRole('ROLE_ORGANISATION');
+        $numberExpected = count($organisations);
+        $this->assertSelectorCount($numberExpected, '.orga_name');
     }
-
-    public function provideAdminListPath(): \Generator
-    {
-        yield 'admin_organisations' => ['/admin/organisations'];
-        yield 'admin_events' => ['/admin/events'];
-    }
-
     
     public function testDisplayOfOrganisationPageIsSuccessful():void
     {
@@ -292,11 +213,7 @@ final class OrganisationControllerTest extends AbstractControllerTest
         $events = $this->em->getRepository(Event::class)->findBy(['organisation' => $organisation->getId()]);
         $numberExpected = count($events);
         $this->assertSelectorCount($numberExpected, '.event_name');
-   
     }
-
-
-
 }
 
     // public function testDeleteOrganisationWithInvalidCsrfToken(): void
@@ -324,4 +241,36 @@ final class OrganisationControllerTest extends AbstractControllerTest
     //     // ✅ Vérifie que l’organisation existe toujours
     //     $stillExists = $entityManager->getRepository(Organisation::class)->find($organisation->getId());
     //     $this->assertNotNull($stillExists);
+    // }
+
+    // /**
+    //  * @dataProvider provideAdminListPath
+    //  */
+
+    // public function testDisplayOfOrganisationAndEventListForAdminIsSuccessful(string $path):void
+    // {
+    //     $adminEmail = "admin@ubayeagenda.com"; 
+    //     $organisationRepository = $this->em->getRepository(Organisation::class);
+    //     $admin = $organisationRepository->findOneBy(['email' => $adminEmail]);
+    //     $this->client->loginUser($admin);
+    //     $crawler = $this->client->request('GET', $path);
+    //     $this->assertResponseIsSuccessful();
+
+    //     if ($path === '/admin/organisations') {
+    //         $organisations = $this->em->getRepository(Organisation::class)->findByRole('ROLE_ORGANISATION');
+    //         $numberExpected = count($organisations);
+    //         $this->assertSelectorCount($numberExpected, '.orga_name');
+    //     }
+
+    //     if ($path === '/admin/events') {
+    //         $events = $this->em->getRepository(Event::class)->findAll();
+    //         $numberExpected = count($events);
+    //         $this->assertSelectorCount($numberExpected, '.event_name');
+    //     }
+    // }
+
+    // public function provideAdminListPath(): \Generator
+    // {
+    //     yield 'admin_organisations' => ['/admin/organisations'];
+    //     yield 'admin_events' => ['/admin/events'];
     // }

@@ -208,8 +208,10 @@ class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        // guarantee every user at least has ROLE_ORGANISATION
+        if (!in_array('ROLE_ADMIN', $roles, true) && !in_array('ROLE_ORGANISATION', $roles, true)) {
+            $roles[] = 'ROLE_ORGANISATION';
+        }
 
         return array_unique($roles);
     }

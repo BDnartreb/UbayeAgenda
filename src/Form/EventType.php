@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Entity\Event;
 use App\Entity\Location;
-use App\Entity\Organisation;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,26 +15,28 @@ use App\Enum\PublicEnum;
 use App\Enum\FeeEnum;
 use App\Enum\ThematicEnum;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\EnumType;
 
 class EventType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
+            ->add('name', TextType::class, ['label' => "Nom de l'événement", 'required' => true,])
             //->add('startDate')
             ->add('startDate', DateTimeType::class, [
                 'widget' => 'single_text', // Un seul champ avec date et heure
                 'html5' => true,           // Utilise le <input type="datetime-local">
-                'label' => 'Date et heure de l’événement',
+                'label' => 'Début',
                 'required' => true,
             ])
-            ->add('description', TextType::class, ['label' => "Description",])
-            ->add('poster', TextType::class, [
-                'label' => 'Affiche',
+            ->add('endDate', DateTimeType::class, [
+                'widget' => 'single_text', // Un seul champ avec date et heure
+                'html5' => true,           // Utilise le <input type="datetime-local">
+                'label' => 'Fin',
                 'required' => false,
             ])
+            ->add('description', TextType::class, ['label' => "Description", 'required' => false,])
+            ->add('poster', TextType::class, ['label' => 'Affiche', 'required' => false,])
             ->add('fee', ChoiceType::class, [
                 'label' => 'Tarif',
                 'choices' => FeeEnum::cases(),
@@ -43,10 +44,7 @@ class EventType extends AbstractType
                 'placeholder' => "Sélectionner un tarif",
                 'required' => true,
             ])
-            ->add('comment', TextareaType::class, [
-                'label' => 'Commentaires',
-                'required' => false,
-            ])
+            ->add('comment', TextareaType::class, ['label' => 'Commentaires','required' => false,])
             ->add('thematic', ChoiceType::class, [
                 'label' => 'Thématique',
                 'choices' => ThematicEnum::cases(),
@@ -65,17 +63,17 @@ class EventType extends AbstractType
             //     'class' => Organisation::class,
             //     'choice_label' => 'id',
             // ])
-            ->add('organisation', EntityType::class, [
-                'class' => Organisation::class,
-                'choice_label' => 'name',
-                'placeholder' => '— Sélectionner une organisation —',
-                'required' => true,
-            ])
-            ->add('newOrganisation', OrganisationType::class, [
-                'mapped' => false,
-                'required' => false,
-                'label' => 'Ou créer une nouvelle organisation',
-            ])
+            // ->add('organisation', EntityType::class, [
+            //     'class' => Organisation::class,
+            //     'choice_label' => 'name',
+            //     'placeholder' => '— Sélectionner une organisation —',
+            //     'required' => true,
+            // ])
+            // ->add('newOrganisation', OrganisationType::class, [
+            //     'mapped' => false,
+            //     'required' => false,
+            //     'label' => 'Ou créer une nouvelle organisation',
+            // ])
             ->add('location', EntityType::class, [
                 'class' => Location::class,
                 'choice_label' => 'name',

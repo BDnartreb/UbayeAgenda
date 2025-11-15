@@ -28,11 +28,13 @@ class Location
     #[ORM\Column(enumType: TownEnum::class)]
     private ?TownEnum $town = null;
 
-    #[ORM\Column(length: 10, nullable: true)]
-    private ?string $lon = null;
-
-    #[ORM\Column(length: 10, nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 8,  nullable: true)]
+    #[Assert\Regex(pattern: '/^[-+]?([0-8]?\d(\.\d+)?|90(\.0+)?)$/', message: 'Latitude invalide.')]
     private ?string $lat = null;
+
+    #[ORM\Column(type: 'decimal', precision: 11, scale: 8, nullable: true)]
+    #[Assert\Regex(pattern: '/^[-+]?((1[0-7]\d|0?\d?\d)(\.\d+)?|180(\.0+)?)$/', message: 'Longitude invalide')]
+    private ?string $lon = null;
 
     /**
      * @var Collection<int, Event>
@@ -74,7 +76,7 @@ class Location
         return $this;
     }
 
-    public function getTown(): TownEnum
+    public function getTown(): ?TownEnum
     {
         return $this->town;
     }
@@ -82,18 +84,6 @@ class Location
     public function setTown(TownEnum $town): static
     {
         $this->town = $town;
-
-        return $this;
-    }
-
-    public function getLon(): ?string
-    {
-        return $this->lon;
-    }
-
-    public function setLon(?string $lon): static
-    {
-        $this->lon = $lon;
 
         return $this;
     }
@@ -106,6 +96,18 @@ class Location
     public function setLat(?string $lat): static
     {
         $this->lat = $lat;
+
+        return $this;
+    }
+
+    public function getLon(): ?string
+    {
+        return $this->lon;
+    }
+
+    public function setLon(?string $lon): static
+    {
+        $this->lon = $lon;
 
         return $this;
     }

@@ -3,15 +3,12 @@
 {% block body %}
     {% include 'partials/_header.html.twig' %}
 
-
-
-
     <main>
         <div class="main-container">
             <div class="left-container">
-                <h1>ADMIN</h1>
-                <div><a href="{{ path('admin_organisations') }}"><h2>Organisations</h2></a></div>
-                <div><a href="{{ path('admin_events') }}"><h2>Evénements</h2></a></div>
+                <h1>ORGA</h1>
+                <div><a href="{{ path('organisation') }}"><h2>Organisation</h2></a></div>
+                <div><a href="{{ path('organisation_event_add') }}"><h2>Créer un événement</h2></a></div>
             </div>
             
             {% block content %}{% endblock %}

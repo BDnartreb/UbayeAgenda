@@ -51,7 +51,7 @@ class TestFixtures extends Fixture implements FixtureGroupInterface
         $thematicCases = ThematicEnum::cases();
         $statusCases = StatusEnum::cases();
         $townCases = TownEnum::cases();
-        $locationNames = ["Mairie", "Salle des fêtes", "El Zocalo", "Séolane", "Le Grain de Sable", "Lou Fresc"];
+        $locationNames = ["LocationTest", "Mairie", "Salle des fêtes", "El Zocalo", "Séolane", "Le Grain de Sable", "Lou Fresc"];
 
         // Create Locations
         $locations = [];
@@ -99,6 +99,20 @@ class TestFixtures extends Fixture implements FixtureGroupInterface
         $orgaTest->setStatus(StatusEnum::INDIVIDUAL);
 
         $manager->persist($orgaTest);    
+
+        $orgaTest2 = new Organisation();
+        $orgaTest2->setName("OrgaTest2");
+        $orgaTest2->setAddress("");
+        $orgaTest2->setTown(TownEnum::B);
+        $orgaTest2->setEmail('orgatest2@email.com');
+        $orgaTest2->setPhone("");
+        $orgaTest2->setFirstName("OrgaTest2");
+        $orgaTest2->setLastName("ORGATEST2");
+        $orgaTest2->setRoles(["ROLE_ORGANISATION"]);
+        $orgaTest2->setPassword($this->userPasswordHasher->hashPassword($orgaTest2, 'password'));
+        $orgaTest2->setStatus(StatusEnum::INDIVIDUAL);
+
+        $manager->persist($orgaTest2);    
 
         $orgaToDelete = new Organisation();
         $orgaToDelete->setName("OrgaToDelete");

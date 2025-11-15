@@ -11,36 +11,39 @@
         </div>
         <div class="event-description-card">
                 <div class="description-card-name"><h1>{{ organisation.name }}</h1></div>
-
+            <form method="post" action="{{ path('organisation_delete') }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le compte de votre organisation et les événements associés ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ organisation.id) }}">
+                <button class="btn btn-danger">Supprimer le compte</button>
+            </form>
         </div>
         <div class="day-container">
                 {% for event in events %}
                 <div class="day">
-                    <div class="day-before"><h1><i class="fa-solid fa-caret-left"></i></h1></div>
                     <div class="event_name"><h1> {{ event.name }} </h1></div>
-                    <div class="day-after"><h1><i class="fa-solid fa-caret-right"></i></h1></div>
                 </div>
-                {% endfor %}
                 <div class="events">
                     <div class="event-card">
                         <div class="event-poster">
                             <img src="{{ asset('images/poster.jpg') }}" alt="Affiche de l'événement">
                         </div>
                         <div class="event-info">
-                            <div class="event-time-location"><h2>11h30 - Lieu de l'Event</h2></div>
-                            <div class="event-name"><h2>Event Name</h2></div>
-                            <div class="event-organizer"><h3>Présenté par : Organisateur Name</h3></div>
-                            <div class="event-moreinfo"><h4>Spectacle - Gratuit - Tout public</h4></div>
+                            <div class="event-time-location"><h2>{{ event.startDate|date('d/m/Y H:i')  }} - {{ event.location.town.value }} </h2></div>
+                            <div class="event-time-location"><h2>{{ event.location.name }}</h2></div>
+                            <div class="event-moreinfo"><h4>{{ event.thematic.value }} - {{ event.fee.value }} - {{ event.public.value }}</h4></div>
                         </div>
                     </div>
+                    <div>
+                    <a href="{{ path('event', {'id': event.id}) }}">Voir</a>
+                    <a href="{{ path('organisation_event_update', {'id': event.id}) }}">Modifier</a>
+                    <form method="post" action="{{ path('organisation_event_delete', {'id': event.id}) }}" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer cet événement ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
+                        <button type="submit" class="btn-link">Supprimer Event</button>
+                    </form>
+                    </div>
                 </div>
+                {% endfor %}
             </div> 
-        {# <form method="post" action="{{ path('orga_delete', { id: organisation.id }) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette organisation ?');">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ organisation.id) }}"> #}
-            <form method="post" action="{{ path('orga_delete') }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le compte de votre organisation et les événements associés ?');">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ organisation.id) }}">
 
-    <button class="btn btn-danger">Supprimer le compte</button>
 </form>
 
 

@@ -6,8 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Event;
+use App\Entity\Organisation;
 use App\Form\EventType;
-use App\Repository\EventRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -32,85 +32,159 @@ final class EventController extends AbstractController
         ]);
     }
 
-    // User and admin
-    #[Route('/organisation/event/add', name: 'event_add', methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function add(Request $request, EntityManagerInterface $em): Response
+    #[Route('/organisation/event/add', name: 'organisation_event_add', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function add(Request $request): Response
     {
         $event = new Event();
-        $form = $this->createForm(EventType::class, $event)->handleRequest($request);
-
         $organisation = $this->getUser();
+        $event->setOrganisation($organisation);
+        $form = $this->createForm(EventType::class, $event);
+        $form->handleRequest($request);  
 
         if ($form->isSubmitted() && $form->isValid())
         {
             $event->setOrganisation($organisation);
-            $em->persist($event);
-            $em->flush();
+            $this->em->persist($event);
+            $this->em->flush();
 
             $this->addFlash('success', 'Événement créé avec succès !');
 
             return $this->redirectToRoute('event', ['id' => $event->getId()]);
         }
 
-        return $this->render('organisation/eventForm.html.twig', ['form' => $form]);
+        return $this->render('/organisation/eventForm.html.twig', ['form' => $form]);
     }
 
     // User on his own event
     // admin for all events
-    #[Route('/organisation/event/update/{id}', name: 'event_update')]
-    public function update(int $id, EventRepository $eventRepository, Request $request, EntityManagerInterface $em): Response
+    #[Route('/organisation/event/update/{id}', name: 'organisation_event_update', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function update(int $id, Request $request): Response
     {
-        $event = $eventRepository->find($id);
-        //dd($event);
-        $form = $this->createForm(EventType::class, $event)->handleRequest($request);
+        $event = $this->em->getRepository(Event::class)->find($id);
+        if(!$event){
+            throw $this->createNotFoundException('Cet événement n\'existe pas.');
+        }
         
+        $organisation= $event->getOrganisation();
+        $connectedUser = $this->getUser();
+        
+        $form = $this->createForm(EventType::class, $event)->handleRequest($request); 
+
+        if ($organisation !== $connectedUser){
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($organisation === $connectedUser){
+            if ($form->isSubmitted() && $form->isValid())
+            {
+                $this->em->persist($event);
+                $this->em->flush();
+
+                $this->addFlash('success', 'Événement modifié avec succès !');
+
+                return $this->redirectToRoute('event', ['id' => $event->getId()]);
+            }
+        }   
+
+        return $this->render('/organisation/eventForm.html.twig', ['form' => $form]);
+    }
+
+    // User for his own event
+    // admin for all events
+    #[Route('/organisation/event/delete/{id}', name: 'organisation_event_delete')]
+    public function delete(int $id): Response
+    {
+        $event = $this->em->getRepository(Event::class)->find($id);
+        if(!$event){
+            throw $this->createNotFoundException('Cet événement n\'existe pas.');
+        }
+        $this->em->remove($event);
+        $this->em->flush();
+
+        $this->addFlash('success', 'Evénement supprimé avec succès !');
+
+        return $this->redirectToRoute('organisation');
+    }
+
+//     if (file_exists($filePath)) {
+//          unlink($filePath); // supprime physiquement le fichier sur le disque
+//      }
+
+
+    #[Route('/admin/event/update/{id}', name: 'admin_event_update')]
+    public function admin_event_update(int $id, Request $request): Response
+    {
+        $event = $this->em->getRepository(Event::class)->find($id);
+        if(!$event){
+            throw $this->createNotFoundException('Cet événement n\'existe pas.');
+        }
+        
+        $form = $this->createForm(EventType::class, $event)->handleRequest($request); 
+
         if ($form->isSubmitted() && $form->isValid())
         {
-            $em->persist($event);
-            $em->flush();
+            $this->em->persist($event);
+            $this->em->flush();
 
             $this->addFlash('success', 'Événement modifié avec succès !');
 
             return $this->redirectToRoute('event', ['id' => $event->getId()]);
         }
 
-        return $this->render('user/eventForm.html.twig', ['form' => $form]);
-
+        return $this->render('/organisation/eventForm.html.twig', ['form' => $form]);
     }
 
-    // User for his own event
-    // admin for all events
-    #[Route('/organisation/event/delete/{id}', name: 'event_delete')]
-    public function delete(int $id, EventRepository $eventRepository, EntityManagerInterface $em): Response
+    #[Route('/admin/event/delete/{id}', name: 'admin_event_delete')]
+    public function admin_event_delete(int $id): Response
     {
-        $event = $eventRepository->find($id);
-        $em->remove($event);
-        $em->flush();
+        $event = $this->em->getRepository(Event::class)->find($id);
+        if(!$event){
+            throw $this->createNotFoundException('Cet événement n\'existe pas.');
+        }
+
+        $this->em->remove($event);
+        $this->em->flush();
 
         $this->addFlash('success', 'Evénement supprimé avec succès !');
-        return $this->redirectToRoute('home');
+
+        return $this->redirectToRoute('admin_events');
     }
 
     /**
-     * Show list of events proposed by one or several organisations the user is member of
+     * Show list of events proposed by the organisation
      */
     #[Route('/organisation/events', name: 'organisation_events')]
     public function userEvents(): Response
     {
-        return $this->render('organisation/organisation_events.html.twig', [
-            'controller_name' => 'EventController',
+        /** @var Organisation $organisation */
+        $organisation = $this->getUser();
+        $events = $this->em->getRepository(Event::class)->findBy(['email' => $organisation->getEmail()]);
+
+        return $this->render('organisation/organisation.html.twig', [
+            'organisation' => $organisation,
+            'events' => $events,
         ]);
     }
 
     /**
-     * Show list of events
+     * Show list of events for admin
      */
     #[Route('/admin/events', name: 'admin_events')]
     public function adminEvents(): Response
     {
-        return $this->render('admin/events.html.twig', [
-            'controller_name' => 'EventController',
-        ]);
+        /** @var Organisation $organisation */
+        $connectedUser = $this->getUser();
+        $admin = $this->em->getRepository(Organisation::class)->findOneBy(['email' => 'admin@uabyeagenda.com']);
+
+        if ($connectedUser === $admin){
+            $events = $this->em->getRepository(Event::class)->findAll();
+
+            return $this->render('admin/events.html.twig', [
+                'events' => $events,
+            ]);
+        }
+
+        return $this->redirectToRoute('/');
     }
 
   
