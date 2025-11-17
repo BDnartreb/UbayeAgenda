@@ -16,16 +16,44 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
-    public function findAllOrderedByStartDateFromNow(): array
+    public function findAllOrderedByStartDateFromToday(): array
     {
+        $today = new \DateTime('today');
+
         return $this->createQueryBuilder('e')
-            ->where('e.startDate > :now')
-            ->setParameter('now', new \DateTime())
+            ->where('e.startDate >= :today')
+            ->setParameter('today', $today)
             ->orderBy('e.startDate', 'ASC')
             ->getQuery()
             ->getResult();
     }
 
+    
+    public function findEventsByOrganisationOrderedByStartDateFromToday(int $id): array
+    {
+        $today = new \DateTime('today');
+
+        return $this->createQueryBuilder('e')
+            ->where('e.startDate >= :today')
+            ->andWhere('e.organisation = :id')
+            ->setParameter('today', $today)
+            ->setParameter('id', $id)
+            ->orderBy('e.startDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findEventsByFiltersOrderedByStartDateFromToday(
+        int $organisationId,
+        int $thematic,
+        int $fee,
+        int $public,
+        int $town,
+        int $location,
+        ): array
+        {
+            
+        }
     //    /**
     //     * @return Event[] Returns an array of Event objects
     //     */

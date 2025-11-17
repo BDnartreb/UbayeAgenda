@@ -1,33 +1,35 @@
     <header>
-        <nav class="navbar navbar-expand-lg custom-navbar">
+        {# <nav class="navbar navbar-expand-lg custom-navbar"> #}
+        <nav class="navbar custom-navbar">
             <div class="header-container">
-                <div class="logo"><a href="{{ path('home') }}">Ubaye Agenda</a></div>
-                <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#menu">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="menu">
-                    <ul class="navbar-nav">
-                         <li class="navbar-item">
-                            <a href="{{ path('home') }}" class="nav-link">Agenda</a>
-                        </li> 
+                <div class="logo">
+                    <a href="{{ path('home') }}">Ubaye Agenda</a>
+                </div>
 
-                        <li class="navbar-item">
-                            {% if app.user is null %}
-                                <a href="{{ path('login') }}" class="nav-link">Connexion</a>
-                            {% endif %}
-                            {% if is_granted('ROLE_ORGANISATION') %}
-                                <a href="{{ path('organisation') }}" class="nav-link">Organisation</a>
-                                <a href="{{ path('organisation_event_add') }}" class="nav-link">Créer un événement</a>
-                                <a href="{{ path('logout') }}" class="nav-link">Déconnexion</a>
-                            {% endif %}
-                            {% if is_granted('ROLE_ADMIN') %}
-                                <a href="{{ path('admin_organisations') }}" class="nav-link">Organisations</a>
-                                <a href="{{ path('admin_events') }}" class="nav-link">Evénements</a>
-                                <a href="{{ path('logout') }}" class="nav-link">Déconnexion</a>
-                            {% endif %}
-
-                        </li> 
-                    </ul>
+                <div class="menu-area">
+                    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#menu">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="menu">
+                        <ul class="navbar-nav menu-links">
+                            <li class="navbar-item">
+                                <a href="{{ path('home') }}" class="nav-link">Agenda</a>
+                                {% if app.user is null %}
+                                    <a href="{{ path('login') }}" class="nav-link">Connexion</a>
+                                {% endif %}
+                                {% if is_granted('ROLE_ORGANISATION') %}
+                                    <a href="{{ path('organisation') }}" class="nav-link">Organisation</a>
+                                    <a href="{{ path('organisation_event_add') }}" class="nav-link">Créer un événement</a>
+                                    <a href="{{ path('logout') }}" class="nav-link">Déconnexion</a>
+                                {% endif %}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('admin_organisations') }}" class="nav-link">Organisations</a>
+                                    <a href="{{ path('admin_events') }}" class="nav-link">Evénements</a>
+                                    <a href="{{ path('logout') }}" class="nav-link">Déconnexion</a>
+                                {% endif %}
+                            </li> 
+                        </ul>
+                    </div>
                 </div>
             </div>
         </nav>

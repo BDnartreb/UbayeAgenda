@@ -18,7 +18,7 @@ final class HomeController extends AbstractController
     #[Route('/eventlist', name: 'eventlist')]
     public function eventlist(EventRepository $eventRepository,): Response
     {
-        $events = $eventRepository->findAllOrderedByStartDateFromNow();
+        $events = $eventRepository->findAllOrderedByStartDateFromToday();
         return $this->render('home/eventlist.html.twig', [
             'controller_name' => 'HomeController',
             'events' => $events,

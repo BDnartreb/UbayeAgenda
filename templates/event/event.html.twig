@@ -11,7 +11,7 @@
         </div>
         <div class="event-description-card">
                 <div class="description-card-name"><h1>{{ event.name }}</h2></div>
-                <div class="description-card-time-location"><h2>{{ event.startDate|date('l j F Y - H:i') }}</h2></div>
+                <div class="description-card-time-location"><h2>{{ event.startDate|date('l j F Y - H:i') }} - {{ event.endDate|date('H:i') }}</h2></div>
                 <div class="description-card-time-location"><h2>{{ event.location.name }} - {{ event.location.town.value }}</h2></div>
                 <div class="description-card-organizer"><h3>Présenté par : {{ event.organisation.name }}</h3></div>
                 <div class="description-card-description"><h3>Description : </h3><textarea class="limited-textarea">{{ event.description }}</textarea></div>

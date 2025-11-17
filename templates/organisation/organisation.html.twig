@@ -4,49 +4,67 @@
 
 {% block content %}
 
-<div class="main-container">
-    <div class="event-description-container">
-        <div class="poster-big-format">
+<div class="orga-main-container">
+    <div class="orga-container">
+        {# <div class="poster-big-format">
             <img src="{{ asset('images/poster.jpg') }}" alt="Affiche de l'événement">
-        </div>
-        <div class="event-description-card">
-                <div class="description-card-name"><h1>{{ organisation.name }}</h1></div>
-            <form method="post" action="{{ path('organisation_delete') }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le compte de votre organisation et les événements associés ?');">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ organisation.id) }}">
-                <button class="btn btn-danger">Supprimer le compte</button>
-            </form>
-        </div>
-        <div class="day-container">
-                {% for event in events %}
-                <div class="day">
-                    <div class="event_name"><h1> {{ event.name }} </h1></div>
+        </div> #}
+        <div class="orga-description-card">
+            <div class="orga-description">
+                <h1>{{ organisation.name }}</h1>
+                <p>{{ organisation.address }}</p>
+                <p>{{ organisation.town.value }}</p>
+                <p>{{ organisation.email }}</p>
+                <p>{{ organisation.phone }}</p>
+                <p>{{ organisation.status.value }}</p>
+                <h2>Référent :</h2>
+                <p>{{ organisation.firstName }}</h3>
+                <p></p>{{ organisation.lastName }}</h3>
+            </div>
+            <div class="orga-description-card-btn">
+                <div>
+                    <a href="{{ path('organisation_update') }}" class="btn-link btn-link-modify">Modifier</a>
                 </div>
-                <div class="events">
-                    <div class="event-card">
+                <div>
+                    <form method="post" action="{{ path('organisation_delete') }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le compte de votre organisation et les événements associés ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ organisation.id) }}">
+                        <button class="btn-link btn-link-delete">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="orga-events-container">
+        {% for event in events %}
+            <div class="orga-event-container"
+                <a href="{{ path('event', {'id': event.id}) }}">
+                    <div class="orga-event-card">
                         <div class="event-poster">
                             <img src="{{ asset('images/poster.jpg') }}" alt="Affiche de l'événement">
                         </div>
-                        <div class="event-info">
-                            <div class="event-time-location"><h2>{{ event.startDate|date('d/m/Y H:i')  }} - {{ event.location.town.value }} </h2></div>
-                            <div class="event-time-location"><h2>{{ event.location.name }}</h2></div>
-                            <div class="event-moreinfo"><h4>{{ event.thematic.value }} - {{ event.fee.value }} - {{ event.public.value }}</h4></div>
+                        <div class="orga-event-info">
+                            <div class="event_name"><h2> {{ event.name }} </h2></div>
+                            <div class="event-time-location"><h4>{{ event.startDate|date('l d/m/Y - H:i')  }} à {{ event.endDate|date('H:i')  }}</h4></div>
+                            <div class="event-time-location"><h4>{{ event.location.name }} - {{ event.location.town.value }}</h4></div>
                         </div>
                     </div>
+                </a>
+                <div class="orga-event-btn">
                     <div>
-                    <a href="{{ path('event', {'id': event.id}) }}">Voir</a>
-                    <a href="{{ path('organisation_event_update', {'id': event.id}) }}">Modifier</a>
-                    <form method="post" action="{{ path('organisation_event_delete', {'id': event.id}) }}" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer cet événement ?');">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
-                        <button type="submit" class="btn-link">Supprimer Event</button>
-                    </form>
+                        <a href="{{ path('organisation_event_update', {'id': event.id}) }}" class="btn-link btn-link-modify">Modifier</a>
+                    </div>
+                    <div>
+                        <form method="post" action="{{ path('organisation_event_delete', {'id': event.id}) }}" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer cet événement ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
+                            <button type="submit" class="btn-link btn-link-delete">Supprimer</button>
+                        </form>
                     </div>
                 </div>
-                {% endfor %}
-            </div> 
+            </div>
+        {% endfor %}
+    </div> 
 
-</form>
 
 
-    </div>
 </div>
 {% endblock %}

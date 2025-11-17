@@ -200,8 +200,10 @@ final class OrganisationController extends AbstractController
     {
         /** @var \App\Entity\Organisation $organisation */
         $organisation = $this->getUser();
-        $events = $this->em->getRepository(Event::class)->findBy(['organisation' => $organisation->getId()]);
-
+        //$events = $this->em->getRepository(Event::class)->findBy(['organisation' => $organisation->getId()]);
+        $organisationId = $organisation->getId();
+        $events = $this->em->getRepository(Event::class)->findEventsByOrganisationOrderedByStartDateFromToday($organisationId);
+ 
         //dd($organisation);
         //$organisation = $this->em->getRepository(Organisation::class)->find($id);
 

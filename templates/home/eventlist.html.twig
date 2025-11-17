@@ -4,12 +4,21 @@
 
 {% block content %}
     <div class="main-container">
-        {% if app.user %}
-            <div>
-                Bienvenue {{ app.user.firstName }} !
-            </div>
-        {% endif %}
-        <div class="left-container"><h1>Filtres</h1></div>
+
+        <div class="filter-container">
+            {% if app.user %}
+                <div>Bienvenue {{ app.user.firstName }} !</div>
+            {% endif %}
+            <div><h1>Filtrer par :</h1></div>
+            {# faire un form> #}
+                <div><p>Organisateur</p></div>
+                <div><p>Genre</p></div>
+                <div><p>Prix</p></div>
+                <div><p>Public</p></div>
+                <div><p>Commune</p></div>
+                <div><p>Lieu</p></div>
+
+        </div>
         <div class="agenda-container">
             <div class="day-container">
 
@@ -35,12 +44,12 @@
                                 <div class="event-info">
                                     <div class="event-name"><h2>{{ event.name }}</h2></div>
                                     {% if event.endDate is null %}
-                                    <div class="event-time-location"><h2>{{ event.startDate|date('H:i') }} - {{ event.location.name }} - {{ event.location.town.value }}</h2></div>
+                                    <div class="event-time-location"><h3>{{ event.startDate|date('H:i') }} - {{ event.location.name }} - {{ event.location.town.value }}</h3></div>
                                     {% else %}
-                                    <div class="event-time-location"><h2>de {{ event.startDate|date('H:i') }} à {{ event.endDate|date('H:i') }} - {{ event.location.name }} - {{ event.location.town.value }}</h2></div>
+                                    <div class="event-time-location"><h3>de {{ event.startDate|date('H:i') }} à {{ event.endDate|date('H:i') }} - {{ event.location.name }} - {{ event.location.town.value }}</h3></div>
                                     {% endif  %}
-                                    <div class="event-organizer"><h3>Présenté par : {{ event.organisation.name }}</h3></div>
-                                    <div class="event-moreinfo"><h4>{{ event.thematic.value }} - {{ event.fee.value }} - {{ event.public.value }}</h4></div>
+                                    <div class="event-organizer"><h4>Présenté par : {{ event.organisation.name }}</h4></div>
+                                    <div class="event-moreinfo"><h5>{{ event.thematic.value }} - {{ event.fee.value }} - {{ event.public.value }}</h5></div>
                                 </div>
                             </div>
                         
