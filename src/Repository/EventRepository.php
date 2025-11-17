@@ -3,6 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Event;
+use App\Enum\FeeEnum;
+use App\Enum\PublicEnum;
+use App\Enum\ThematicEnum;
+use App\Enum\TownEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -44,16 +48,62 @@ class EventRepository extends ServiceEntityRepository
     }
 
     public function findEventsByFiltersOrderedByStartDateFromToday(
-        int $organisationId,
-        int $thematic,
-        int $fee,
-        int $public,
-        int $town,
-        int $location,
-        ): array
+        array $organisations = [],
+        array $thematics = [],
+        array $fees = [],
+        array $publics = [],
+        array $towns = [],
+        array $locations = [],
+         ): array
         {
-            
+            $today = new \DateTime('today');
+
+            $qb = $this->createQueryBuilder('e')
+                ->leftJoin('e.location', 'l') 
+                ->addSelect('l');;
+
+            if (!empty($organisations)) {
+                $qb->andWhere('e.organisation IN (:organisations)')
+                    ->setParameter('organisations', $organisations);
+            }
+
+            if (!empty($thematics)) {
+                $thematicEnums = array_map(fn($t) => ThematicEnum::from($t), $thematics);
+                $qb->andWhere('e.thematic IN (:thematics)')
+                    ->setParameter('thematics', $thematicEnums);
+            }
+
+            if (!empty($fees)) {
+                $feeEnums = array_map(fn($f) => FeeEnum::from($f), $fees);
+                $qb->andWhere('e.fee IN (:fees)')
+                    ->setParameter('fees', $feeEnums);
+            }
+
+            if (!empty($publics)) {
+                $publicEnums = array_map(fn($p) => PublicEnum::from($p), $publics);
+                $qb->andWhere('e.public IN (:publics)')
+                    ->setParameter('publics', $publicEnums);
+            }
+
+            if (!empty($towns)) {
+                $townEnums = array_map(fn($p) => TownEnum::from($p), $towns);
+                $qb->andWhere('l.town IN (:towns)')
+                    ->setParameter('town', $townEnums);
+            }
+
+            if (!empty($locations)) {
+                $qb->andWhere('e.location IN (:locations)')
+                    ->setParameter('locations', $locations);
+            }
+
+            return $qb->andWhere('e.startDate >= :today')
+                ->setParameter('today', $today)
+                ->orderBy('e.startDate', 'ASC')
+                ->getQuery()
+                ->getResult();
         }
+
+
     //    /**
     //     * @return Event[] Returns an array of Event objects
     //     */
