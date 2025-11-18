@@ -52,15 +52,17 @@ class EventRepository extends ServiceEntityRepository
         array $thematics = [],
         array $fees = [],
         array $publics = [],
+        // array $locationsbytown = [],
         array $towns = [],
         array $locations = [],
          ): array
         {
+            //dd($fees);
             $today = new \DateTime('today');
 
             $qb = $this->createQueryBuilder('e')
                 ->leftJoin('e.location', 'l') 
-                ->addSelect('l');;
+                ->addSelect('l');;;
 
             if (!empty($organisations)) {
                 $qb->andWhere('e.organisation IN (:organisations)')
@@ -86,9 +88,8 @@ class EventRepository extends ServiceEntityRepository
             }
 
             if (!empty($towns)) {
-                $townEnums = array_map(fn($p) => TownEnum::from($p), $towns);
                 $qb->andWhere('l.town IN (:towns)')
-                    ->setParameter('town', $townEnums);
+                    ->setParameter('towns', $towns);
             }
 
             if (!empty($locations)) {

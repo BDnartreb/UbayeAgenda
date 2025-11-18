@@ -4,123 +4,134 @@
 
 {% block content %}
     <div class="main-container">
-
         <div class="filter-container">
             {% if app.user %}
                 <div>Bienvenue {{ app.user.firstName }} !</div>
             {% endif %}
             <div><h1>Filtrer par :</h1></div>
-    
-            <form id="filters-form" method="get" action="{{ path('eventlist') }}">
+
+
+           <form id="filters-form" method="get" action="{{ path('eventlist') }}">
                 <div class="filter-group">
-                    <div class="filter-title">Organisateur</div>
-                        <div class="filter-options">
-                            {% for organisation in organisations %}
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        name="organisations[]" 
-                                        value="{{ organisation.name }}"
-                                        {% if organisation.name in selectedOrganisations %}checked{% endif %}
-                                    >
-                                    {{ organisation.name }}
-                                </label>
-                            {% endfor %}
-                        </div>
+                    <input type="checkbox" id="toggle-organisateur" hidden>
+                    <label for="toggle-organisateur" class="filter-title">Organisateur</label>
+                    <div class="filter-options {% if selectedOrganisations is not empty %}open{% endif %}">
+                        {% for organisation in organisations %}
+                            <label>
+                                <input 
+                                    type="checkbox" 
+                                    name="organisations[]" 
+                                    value="{{ organisation.name }}"
+                                    {% if organisation.name in selectedOrganisations %}checked{% endif %}
+                                >
+                                {{ organisation.name }}
+                            </label><br>
+                        {% endfor %}
+                    </div>
                 </div>
 
                 <div class="filter-group">
-                    <div class="filter-title">Thématique</div>
-                        <div class="filter-options">
-                            {% for thematic in thematics %}
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        name="thematics[]" 
-                                        value="{{ thematic.value }}"
-                                        {% if thematic.value in selectedThematics %}checked{% endif %}
-                                    >
-                                    {{ thematic.value }}
-                                </label>
-                            {% endfor %}
-                        </div>
+                    <input type="checkbox" id="toggle-thematic" hidden>
+                    <label for="toggle-thematic" class="filter-title">Thématique</label>
+                    <div class="filter-options {% if selectedThematics is not empty %}open{% endif %}">
+                        {% for thematic in thematics %}
+                            <label>
+                                <input 
+                                    type="checkbox" 
+                                    name="thematics[]" 
+                                    value="{{ thematic.name }}"
+                                    {% if thematic.value in selectedThematics %}checked{% endif %}
+                                >
+                                {{ thematic.value }}
+                            </label><br>
+                        {% endfor %}
+                    </div>
                 </div>
 
                 <div class="filter-group">
-                    <div class="filter-title">Prix</div>
-                        <div class="filter-options">
-                            {% for fee in fees %}
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        name="fees[]" 
-                                        value="{{ fee.value }}"
-                                        {% if fee.value in selectedFees %}checked{% endif %}
-                                    >
-                                    {{ fee.value }}
-                                </label>
-                            {% endfor %}
-                        </div>
+                    <input type="checkbox" id="toggle-fee" hidden>
+                    <label for="toggle-fee" class="filter-title">Prix</label>
+                    <div class="filter-options {% if selectedFees is not empty %}open{% endif %}">
+                        {% for fee in fees %}
+                            <label>
+                                <input 
+                                    type="checkbox" 
+                                    name="fees[]" 
+                                    value="{{ fee.value }}"
+                                    {% if fee.value in selectedFees %}checked{% endif %}
+                                >
+                                {{ fee.value }}
+                            </label><br>
+                        {% endfor %}
+                    </div>
                 </div>
 
                 <div class="filter-group">
-                    <div class="filter-title">Public</div>
-                        <div class="filter-options">
-                            {% for public in publics %}
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        name="publics[]" 
-                                        value="{{ public.value }}"
-                                        {% if public.value in selectedPublics %}checked{% endif %}
-                                    >
-                                    {{ public.value }}
-                                </label>
-                            {% endfor %}
-                        </div>
+                    <input type="checkbox" id="toggle-public" hidden>
+                    <label for="toggle-public" class="filter-title">Public</label>
+                    <div class="filter-options {% if selectedPublics is not empty %}open{% endif %}">
+                        {% for public in publics %}
+                            <label>
+                                <input 
+                                    type="checkbox" 
+                                    name="publics[]" 
+                                    value="{{ public.value }}"
+                                    {% if public.value in selectedPublics %}checked{% endif %}
+                                >
+                                {{ public.value }}
+                            </label><br>
+                        {% endfor %}
+                    </div>
                 </div>
 
                 <div class="filter-group">
-                    <div class="filter-title">Commune</div>
-                        <div class="filter-options">
-                            {% for town in towns %}
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        name="towns[]" 
-                                        value="{{ town.value }}"
-                                        {% if town.value in selectedTowns %}checked{% endif %}
-                                    >
-                                    {{ town.value }}
-                                </label>
-                            {% endfor %}
-                        </div>
+                    <input type="checkbox" id="toggle-town" hidden>
+                    <label for="toggle-town" class="filter-title">Commune</label>
+                    <div class="filter-options {% if selectedTowns is not empty %}open{% endif %}">
+                        {% for town in towns %}
+                            <label>
+                                <input 
+                                    type="checkbox" 
+                                    name="towns[]" 
+                                    value="{{ town.value }}"
+                                    {% if town.value in selectedTowns %}checked{% endif %}
+                                >
+                                {{ town.value }}
+                            </label><br>
+                        {% endfor %}
+                    </div>
                 </div>
 
                 <div class="filter-group">
-                    <div class="filter-title">Lieu</div>
-                        <div class="filter-options">
-                            {% for location in locations %}
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        name="locations[]" 
-                                        value="{{ location.name }}"
-                                        {% if location.name in selectedLocations %}checked{% endif %}
-                                    >
-                                    {{ location.name }}
-                                </label>
-                            {% endfor %}
-                        </div>
+                    <input type="checkbox" id="toggle-location" hidden>
+                    <label for="toggle-location" class="filter-title">Lieu</label>
+                    <div class="filter-options {% if selectedLocations is not empty %}open{% endif %}">
+                        {% for location in locations %}
+                            <label>
+                                <input 
+                                    type="checkbox" 
+                                    name="locations[]" 
+                                    value="{{ location.name }}"
+                                    {% if location.name in selectedLocations %}checked{% endif %}
+                                >
+                                {{ location.name }}
+                            </label><br>
+                        {% endfor %}
+                    </div>
                 </div>
             <button type="submit" class="btn btn-danger">Filtrer</button>
+            {# <button type="button" id="reset-filters" class="btn btn-secondary">Réinitialiser</button> #}
             </form>
         </div>
-*
+
        <div class="agenda-container">
             <div class="day-container">
 
                 {% set currentDate = null %}
+
+                {% if events is empty %}
+                    <h1>{{ noEventSelectedMessage }}</h1>
+                {% endif %}
 
                 {% for event in events %}
                     {% set eventDate = event.startDate|date('Y-m-d') %}
@@ -160,9 +171,10 @@
             </div> 
         </div>
     </div>
+{% endblock %}
 
-    <script src="{{ asset('js/filters.js') }}"></script>
-
+{% block javascripts %}
+        <script src="{{ asset('js/filters.js') }}" defer></script>
 {% endblock %}
 
 

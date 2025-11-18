@@ -1,5 +1,5 @@
 
-/* HEADER */
+/*************** HEADER ****************/
 
 /* .navbar {
     display: flex;
@@ -98,7 +98,7 @@
     color: orange;
 } */
 
-/* FOOTER */
+/**************** FOOTER ****************/
 .footer-container {
     display: flex;
     justify-content: center;
@@ -126,7 +126,7 @@
 
 }
 
-/* BUTTON */
+/**************** BUTTON ****************/
 .btn-link {
     display: inline-block;
     padding: 5px 20px;
@@ -153,12 +153,12 @@
     box-shadow: 0 5px 10px rgba(0,0,0,0.3); /* shadow plus marqué */
 }
 
-/* BODY */
+/**************** BODY ****************/
 body {
     background-color: white;
 }
 
-/* PAGE AGENDA */
+/**************** PAGE EVENTLIST ****************/
 .main-container {
     display: flex;
     flex-direction: row;
@@ -234,8 +234,45 @@ body {
 .event-organizer{}
 .event-moreinfo{}
 
+/**************** EVENTLIST FILTERS ****************/
+/* Masquer toutes les listes par défaut */
+.filter-options {
+  display: none;
+  margin-left: 20px; /* indentation optionnelle */
+  margin-top: 5px;
+}
 
-/* PAGE EVENT */
+/* Afficher la liste quand la checkbox "toggle" est cochée */
+#toggle-organisateur:checked + .filter-title + .filter-options,
+#toggle-thematic:checked + .filter-title + .filter-options,
+#toggle-fee:checked + .filter-title + .filter-options,
+#toggle-public:checked + .filter-title + .filter-options,
+#toggle-town:checked + .filter-title + .filter-options,
+#toggle-location:checked + .filter-title + .filter-options {
+  display: block;
+}
+
+/* Style des titres pour qu’ils ressemblent à des boutons */
+.filter-title {
+  display: block;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+/* Optionnel : petit effet visuel au survol */
+.filter-title:hover {
+  color: #d9534f; /* rouge bootstrap */
+}
+
+
+/* Animation ouverture */
+.filter-options.open {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/*************** PAGE EVENT **************/
 .event-description-container{
     display: flex;
     margin: 30px 0px 30px 0px;
@@ -275,7 +312,7 @@ body {
     height: calc(1.5em * 3); /* 3 lignes visibles */
 }
 
-/* PAGE ORGANISATION */
+/**************** PAGE ORGANISATION ****************/
 
 .orga-main-container {
     display: flex;
@@ -372,47 +409,6 @@ body {
         flex-direction: row;
         gap: 20px;
     }
-/*********************************/
-/* Structure principale */
-.filter-group {
-    margin-bottom: 15px;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 10px;
-}
-
-/* Titre cliquable */
-.filter-title {
-    font-weight: bold;
-    cursor: pointer;
-    padding: 10px;
-    background: #f2f2f2;
-    border-radius: 5px;
-}
-
-/* Zone des options (cachée par défaut) */
-.filter-options {
-    display: none;
-    margin-top: 10px;
-    padding-left: 20px;
-}
-
-/* Espacement entre cases */
-.filter-options label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-/* Animation ouverture */
-.filter-options.open {
-    display: block;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-3px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
 
 
 

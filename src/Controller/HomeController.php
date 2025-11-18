@@ -43,13 +43,7 @@ final class HomeController extends AbstractController
     #[Route('/eventlist', name: 'eventlist', methods: ['GET'])]
     public function eventlist(EventRepository $eventRepository, Request $request): Response
     {
-        $selectedOrganisations = $request->query->all('organisations');
-        $selectedThematics = $request->query->all('thematics');
-        $selectedFees = $request->query->all('fees');
-        $selectedPublics = $request->query->all('publics');
-        $selectedTowns = $request->query->all('towns');
-        $selectedLocations = $request->query->all('locations');
-
+        //Filter Parameters
         $organisations = $this->em->getrepository(Organisation::class)->findAll();
         $thematics = ThematicEnum::cases();
         $fees = FeeEnum::cases();
@@ -57,30 +51,67 @@ final class HomeController extends AbstractController
         $towns = TownEnum::cases();
         $locations = $this->em->getrepository(Location::class)->findAll();
 
+        // Filters selected
+        $selectedThematics = $request->query->all('thematics');
+        $selectedFees = $request->query->all('fees');
+        $selectedPublics = $request->query->all('publics'); 
+
+        $selectedOrganisations = $request->query->all('organisations');
+            $selectedOrganisationsId = [];
+            foreach ($selectedOrganisations as $orgaName) {
+                $organisationId = $this->em->getRepository(Organisation::class)->findOneBy(['name' => $orgaName])->getId();
+                $selectedOrganisationsId[] = $organisationId;
+            }
+
+        $selectedLocations = $request->query->all('locations');
+            $selectedLocationsId = [];
+            foreach ($selectedLocations as $locationName) {
+                $locationId = $this->em->getRepository(Location::class)->findOneBy(['name' => $locationName])->getId();
+                $selectedLocationsId[] = $locationId;
+            }
+
+
+        $selectedTowns = $request->query->all('towns'); 
+        // $selectedTowns = $request->query->all('towns');
+        //     $selectedLocationsByTown = [];
+        //     foreach ($selectedTowns as $townName) {
+        //         $locationIdByTown = $this->em->getRepository(Location::class)->findOneBy(['town' => $townName])->getId();
+        //         $selectedLocationsByTown[] = $locationIdByTown;
+        //     }
+
+        //events selected
         $events = $eventRepository->findEventsByFiltersOrderedByStartDateFromToday(
             fees: $selectedFees,
             thematics: $selectedThematics,
             publics: $selectedPublics,
+            // locationsbytown: $selectedLocationsByTown,
             towns: $selectedTowns,
-            organisations: $organisations,
-            locations: $locations,
+            organisations: $selectedOrganisationsId,
+            locations: $selectedLocationsId,
         );
 
+        $noEventSelectedMessage = null;
+        if (!$events){
+            $noEventSelectedMessage = "Aucun événement ne correspond à la sélection";
+        }
+
+        // filter parameters and filters selected
         return $this->render('home/eventlist.html.twig', [
             'controller_name' => 'HomeController',
             'events' => $events,
             'thematics' => $thematics,
-            'selectedThematics' => $selectedThematics,
             'fees' => $fees,
-            'selectedFees' => $selectedFees,
             'publics' => $publics,
-            'selectedPublics' => $selectedPublics,
             'towns' => $towns,
-            'selectedTowns' => $selectedTowns,
             'organisations' => $organisations,
-            'selectedOrganisations' => $selectedOrganisations,
             'locations' => $locations,
+            'selectedThematics' => $selectedThematics,   
+            'selectedFees' => $selectedFees,            
+            'selectedPublics' => $selectedPublics,            
+            'selectedTowns' => $selectedTowns,            
+            'selectedOrganisations' => $selectedOrganisations,            
             'selectedLocations' => $selectedLocations,
+            'noEventSelectedMessage' => $noEventSelectedMessage,
         ]);
     }
 
