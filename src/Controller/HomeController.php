@@ -54,7 +54,8 @@ final class HomeController extends AbstractController
         // Filters selected
         $selectedThematics = $request->query->all('thematics');
         $selectedFees = $request->query->all('fees');
-        $selectedPublics = $request->query->all('publics'); 
+        $selectedPublics = $request->query->all('publics');
+        $selectedTowns = $request->query->all('towns'); 
 
         $selectedOrganisations = $request->query->all('organisations');
             $selectedOrganisationsId = [];
@@ -71,20 +72,11 @@ final class HomeController extends AbstractController
             }
 
 
-        $selectedTowns = $request->query->all('towns'); 
-        // $selectedTowns = $request->query->all('towns');
-        //     $selectedLocationsByTown = [];
-        //     foreach ($selectedTowns as $townName) {
-        //         $locationIdByTown = $this->em->getRepository(Location::class)->findOneBy(['town' => $townName])->getId();
-        //         $selectedLocationsByTown[] = $locationIdByTown;
-        //     }
-
         //events selected
         $events = $eventRepository->findEventsByFiltersOrderedByStartDateFromToday(
             fees: $selectedFees,
             thematics: $selectedThematics,
             publics: $selectedPublics,
-            // locationsbytown: $selectedLocationsByTown,
             towns: $selectedTowns,
             organisations: $selectedOrganisationsId,
             locations: $selectedLocationsId,

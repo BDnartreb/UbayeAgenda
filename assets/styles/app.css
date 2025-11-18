@@ -312,6 +312,40 @@ body {
     height: calc(1.5em * 3); /* 3 lignes visibles */
 }
 
+.truncate-multi-responsive {
+  width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  line-height: 1.3em;
+}
+
+.clamp-container {
+  width: 250px;
+  cursor: pointer;
+}
+
+/* Par défaut : tronqué */
+.clamp3 {
+  width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  cursor: pointer;
+}
+
+/* Quand tu coches → affichage complet */
+#toggle-text:checked + .clamp3 {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+  white-space: normal;
+}
+
+
+
 /**************** PAGE ORGANISATION ****************/
 
 .orga-main-container {

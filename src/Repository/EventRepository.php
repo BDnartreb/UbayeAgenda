@@ -52,7 +52,6 @@ class EventRepository extends ServiceEntityRepository
         array $thematics = [],
         array $fees = [],
         array $publics = [],
-        // array $locationsbytown = [],
         array $towns = [],
         array $locations = [],
          ): array

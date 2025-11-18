@@ -9,16 +9,23 @@
         <div class="poster-big-format">
             <img src="{{ asset('images/poster.jpg') }}" alt="Affiche de l'événement">
         </div>
+
         <div class="event-description-card">
-                <div class="description-card-name"><h1>{{ event.name }}</h2></div>
-                <div class="description-card-time-location"><h2>{{ event.startDate|date('l j F Y - H:i') }} - {{ event.endDate|date('H:i') }}</h2></div>
-                <div class="description-card-time-location"><h2>{{ event.location.name }} - {{ event.location.town.value }}</h2></div>
-                <div class="description-card-organizer"><h3>Présenté par : {{ event.organisation.name }}</h3></div>
-                <div class="description-card-description"><h3>Description : </h3><textarea class="limited-textarea">{{ event.description }}</textarea></div>
-                <div class="description-card-comment"><h3>Commentaires : </h3><textarea class="limited-textarea">{{ event.comment }}</textarea></div>
-                <div class="description-card-moreinfo"><h4>Thématique : {{ event.thematic.value }}</div>
-                <div class="description-card-moreinfo"><h4>Prix : {{ event.fee.value }}</h4></div>
-                <div class="description-card-moreinfo"><h4>Public : {{ event.public.value }}</h4></div>
+            <div class="description-card-name"><h1>{{ event.name }}</h2></div>
+            <div class="description-card-time-location"><h2>{{ event.startDate|date('l j F Y') }}</h2></div>
+            <div class="description-card-time-location"><h3>{{ event.startDate|date('H:i') }} {% if event.endDate %} à {{ event.endDate|date('H:i') }} {% endif %}</h3></div>
+            <div class="description-card-time-location"><h3>{{ event.location.name }} - {{ event.location.town.value }}</h3></div>
+            <div class="description-card-time-location"><h4>{{ event.location.address }}</h4></div>
+            <div class="description-card-organizer"><h4>Présenté par : {{ event.organisation.name }}</h4></div>
+            <div class="description-card-description"><h4>Description : </h4></div>
+                <label class="clamp-wrapper"><input type="checkbox" hidden id="toggle-text">
+                <div class="clamp3">{{ event.description }}</div>
+                </label>
+            <div class="description-card-comment"><h4>Commentaires : </h4></div>
+                <label class="clamp-wrapper"><input type="checkbox" hidden id="toggle-text">
+                <div class="clamp3">{{ event.comment }}</div>
+                </label>  
+            <div class="description-card-moreinfo"><h4>{{ event.thematic.value }} - {{ event.fee.value }} - Public : {{ event.public.value }}</h4></div>
         </div>
     </div>
 </div>
