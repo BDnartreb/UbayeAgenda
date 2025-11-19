@@ -7,7 +7,7 @@
 <div class="main-container">
     <div class="event-description-container">
         <div class="poster-big-format">
-            <img src="{{ asset('images/poster.jpg') }}" alt="Affiche de l'événement">
+            <img src="{{ asset(event.poster) }}" alt="Affiche de l'événement">
         </div>
 
         <div class="event-description-card">
@@ -26,6 +26,10 @@
                 <div class="clamp3">{{ event.comment }}</div>
                 </label>  
             <div class="description-card-moreinfo"><h4>{{ event.thematic.value }} - {{ event.fee.value }} - Public : {{ event.public.value }}</h4></div>
+            {% if app.user is same as(event.organisation) %} 
+                <a href="{{ path('organisation_event_update', {'id': event.id}) }}" class="btn-link btn-link-modify">Modifier</a>
+            {% endif %}
+        
         </div>
     </div>
 </div>

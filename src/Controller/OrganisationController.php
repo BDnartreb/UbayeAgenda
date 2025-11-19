@@ -171,26 +171,6 @@ final class OrganisationController extends AbstractController
 
         return $this->redirectToRoute('admin_organisations');
     }
-   
-    #[Route('/organisation/location/add', name: 'organisation_location_add', methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function organisationLocationAdd(Request $request): Response
-    {
-        $location = new Location();
-        $form = $this->createForm(LocationType::class, $location);
-        $form->handleRequest($request);  
-
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $this->em->persist($location);
-            $this->em->flush();
-
-            $this->addFlash('success', 'Lieu créé avec succès !');
-
-            return $this->redirectToRoute('home');
-        }
-
-        return $this->render('/organisation/locationForm.html.twig', ['form' => $form]);
-    }
 
     /**
      * show organisation page

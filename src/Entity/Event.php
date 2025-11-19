@@ -8,6 +8,7 @@ use App\Enum\ThematicEnum;
 use App\Repository\EventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
@@ -39,6 +40,14 @@ class Event
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $poster = null;
+
+    #[Assert\File (
+        maxSize: '2M',
+        mimeTypes: ['application/pdf', 'image/jpeg', 'image/png'],
+        mimeTypesMessage: 'Veuillez télécharger un fichier de format PDF, JPG ou PNG.',
+        maxSizeMessage: 'Le fichier ne peut pas dépasser 2 Mo.',
+    )]
+    private ?UploadedFile $file = null;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(enumType: FeeEnum::class)]
@@ -125,14 +134,26 @@ class Event
         return $this;
     }
 
-    public function getPoster(): ?string
+        public function getPoster(): ?String
     {
         return $this->poster;
     }
 
-    public function setPoster(?string $poster): static
+    public function setPoster(?String $poster): static
     {
         $this->poster = $poster;
+
+        return $this;
+    }
+
+    public function getFile(): ?UploadedFile
+    {
+        return $this->file;
+    }
+
+    public function setFile(?UploadedFile $file): self
+    {
+        $this->file = $file;
 
         return $this;
     }

@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20251109115423 extends AbstractMigration
+final class Version20251119110018 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,7 +21,7 @@ final class Version20251109115423 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE event ADD end_date TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL
+            ALTER TABLE event ADD poster VARCHAR(255) DEFAULT NULL
         SQL);
     }
 
@@ -32,7 +32,7 @@ final class Version20251109115423 extends AbstractMigration
             CREATE SCHEMA public
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE event DROP end_date
+            ALTER TABLE event DROP poster
         SQL);
     }
 }

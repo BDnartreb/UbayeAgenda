@@ -127,7 +127,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         }
 
         // Create Events
-        for ($j=1; $j < 20; $j++) {
+        for ($j=11; $j < 27; $j++) {
             $event = new Event();
             $event->setOrganisation($organisations[random_int(0,count($organisations)-1)]);
             $event->setName("EventName" . $j);
@@ -143,7 +143,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             }
             $event->setLocation($locations[random_int(0,count($locations)-1)]);    
             $event->setDescription($faker->paragraphs(10, true));
-            $event->setPoster($faker->imageUrl(330, 500, 'poster', true));
+            $event->setPoster(sprintf('uploads/' . $j . '.png'));
             $event->setComment($faker->paragraphs(10, true));
             
             $randomFee = $feeCases[random_int(0, count($feeCases)-1)];

@@ -7,21 +7,24 @@
         <div class="row min-vh-100 align-items-center justify-content-center">
             <nav class="col-md-6 col-lg-4">
                 <div class="position-sticky">
-                    {{ form_start(form) }}
+                    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+                    {# {{ form_start(form) }} #}
                         <h1 class="h3 mb-3 fw-normal">Créer un événement</h1>
                         {{ form_errors(form) }}
                         <fieldset class="mb-3">
+                            <div class="mb-3">{{ form_row(form.location) }}
+                                <a href="{{ path('organisation_location_add') }}" alt="" >Créer un nouveau lieu</a>
+                            </div>
                             <div class="mb-3">{{ form_row(form.name) }}</div>
                             <div class="mb-3">{{ form_row(form.startDate) }}</div>
                             <div class="mb-3">{{ form_row(form.endDate) }}</div>
                             <div class="mb-3">{{ form_row(form.description) }}</div>
-                            <div class="mb-3">{{ form_row(form.poster) }}</div>
-                            <div class="mb-3">{{ form_row(form.fee) }}</div>
                             <div class="mb-3">{{ form_row(form.comment) }}</div>
                             <div class="mb-3">{{ form_row(form.thematic) }}</div>
+                            <div class="mb-3">{{ form_row(form.fee) }}</div>
                             <div class="mb-3">{{ form_row(form.public) }}</div>
-                            <div class="mb-3">{{ form_row(form.location) }}</div>
-                            <a href="{{ path('organisation_location_add') }}" alt="" >Créer un nouveau lieu</a>
+                            <div class="mb-3">{{ form_row(form.file) }}</div>
                         </fieldset>
                         <button class="btn btn-primary" type="submit">Enregistrer</button>
 

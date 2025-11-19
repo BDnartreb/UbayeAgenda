@@ -154,16 +154,39 @@
 }
 
 /**************** BODY ****************/
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
 body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; 
     background-color: white;
 }
 
-/**************** PAGE EVENTLIST ****************/
+.content {
+    flex: 1; /* prend tout l’espace restant entre le header etle footer */
+}
+
+/**************** HOME PAGES ****************/
 .main-container {
     display: flex;
     flex-direction: row;
     justify-content: center;
 }
+
+.standard-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    padding: 30px 0px 30px 0px;
+}
+
+/**************** PAGE EVENTLIST ****************/
 
 .filter-container {
     width: 25vw;
@@ -193,17 +216,11 @@ body {
     background-color: rgb(247, 226, 199);
     border-radius: 20px;  
 }
-.day-before{
-
-}
-.day{
-}
-.day-after{
-}
 
 .events a {
     text-decoration: none;
 }
+
 .event-card{
     display: flex;
     flex-direction: row;
@@ -212,11 +229,13 @@ body {
     background-color: rgb(245, 242, 238);
     border-radius: 20px;
 }
+
 .event-poster{
     padding-top: 10px;
     width: 100px;
     height: 150px;
 }
+
 .event-poster img{
     width: 100%;
     height: 100%;

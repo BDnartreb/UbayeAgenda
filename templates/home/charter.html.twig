@@ -1,20 +1,34 @@
 {% extends 'front.html.twig' %}
 
-{% block title %}A Propos{% endblock %}
+{% block title %}Charte{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <div class="row min-vh-100 align-items-center justify-content-center">
-            <nav class="col-md-6 col-lg-4">
-                <div class="position-sticky">
-            
-                        <h1 class="h3 mb-3 fw-normal">Charte d'utilisation du site</h1>
-                        <p>Je certifie avoir lu la charte d'utilistaion de se site à m'engage à la respecter.</p>
-                        <a href="{{ path('register') }}" class="button-link">S'inscrire</a>
+    <div class="main-container">
+        <div class="standard-container">
+           
+            <h1>Charte de l’utilisateur</h1>
+            <p>Ah si j'avais su qu'il y avait cela hier j'y serais allé !</p>
+            <p>Ce site a pour but d'éviter ce type de déception en regroupant tous les événements 
+                de la Vallée de l'Ubaye sur un même canal d'information.</p>                            
 
-                       
-                </div>
-            </nav>
+            <p>Il est autogéré, aussi il appelle à de la discipline dans son utilisation.</p>
+
+            <p>Les événements proposés doivent être ouverts à tous, il ne s'agit pas d'y mentionner ses événements privés.</p> 
+
+            <h2>Mode d'emploi :</h2>
+            <p>Les événements sont consultables en libre accès.
+            A la connexion la liste des événements classés par ordre de date et d'heure à partir de la date du jour vous sont proposés.
+            Vous pouvez avoir plus de détail en cliquant dessus.</p>
+
+            <p>Si vous souhaiter enregistrer un événement il vous faut d'abord créer un compte.
+            Les comptes en sont pas des comptes personnels mais comptes organisateurs.</p>
+            <p>
+            Une fois enregistré vous pouvez vous connecter avec un email et un mot de passe.
+            Vous créer votre événement à partir d'un formulaire.
+            Une page vous propose la possibilité de gérer vos événements</p>
+            
+            <div><a href="{{ path('register') }}" class="btn-link btn-link-modify">S'inscrire</a></div>
+            
         </div>
     </div>
 {% endblock %}

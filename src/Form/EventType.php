@@ -15,12 +15,21 @@ use App\Enum\PublicEnum;
 use App\Enum\FeeEnum;
 use App\Enum\ThematicEnum;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class EventType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('location', EntityType::class, [
+                'class' => Location::class,
+                'label' => 'Lieu',
+                'choice_label' => 'name',
+                'placeholder' => '— Sélectionner un lieu —',
+                'required' => true,
+            ])
             ->add('name', TextType::class, ['label' => "Nom de l'événement", 'required' => true,])
             //->add('startDate')
             ->add('startDate', DateTimeType::class, [
@@ -35,21 +44,28 @@ class EventType extends AbstractType
                 'label' => 'Fin',
                 'required' => false,
             ])
-            ->add('description', TextType::class, ['label' => "Description", 'required' => false,])
-            ->add('poster', TextType::class, ['label' => 'Affiche', 'required' => false,])
-            ->add('fee', ChoiceType::class, [
-                'label' => 'Tarif',
-                'choices' => FeeEnum::cases(),
-                'choice_label' => fn (FeeEnum $fee) => ucfirst($fee->value),
-                'placeholder' => "Sélectionner un tarif",
-                'required' => true,
+            ->add('description', TextareaType::class, [
+                'label' => "Description",
+                'required' => false,
+                'attr' => ['placeholder' => 'Taper ou coller un texte descriptif de l\'événement',],
             ])
-            ->add('comment', TextareaType::class, ['label' => 'Commentaires','required' => false,])
+            ->add('comment', TextareaType::class, [
+                'label' => 'Commentaires',
+                'required' => false,
+                'attr' => ['placeholder' => 'Ajouter des informations complémentaires, liens, ...',],
+            ])
             ->add('thematic', ChoiceType::class, [
                 'label' => 'Thématique',
                 'choices' => ThematicEnum::cases(),
                 'choice_label' => fn (ThematicEnum $thematic) => ucfirst($thematic->value),
                 'placeholder' => "Sélectionner une thématique",
+                'required' => true,
+            ])
+            ->add('fee', ChoiceType::class, [
+                'label' => 'Tarif',
+                'choices' => FeeEnum::cases(),
+                'choice_label' => fn (FeeEnum $fee) => ucfirst($fee->value),
+                'placeholder' => "Sélectionner un tarif",
                 'required' => true,
             ])
             ->add('public', ChoiceType::class, [
@@ -59,26 +75,22 @@ class EventType extends AbstractType
                 'placeholder' => "Sélectionner une catégorie de public",
                 'required' => true,
             ])
-            // ->add('organisation', EntityType::class, [
-            //     'class' => Organisation::class,
-            //     'choice_label' => 'id',
-            // ])
-            // ->add('organisation', EntityType::class, [
-            //     'class' => Organisation::class,
-            //     'choice_label' => 'name',
-            //     'placeholder' => '— Sélectionner une organisation —',
-            //     'required' => true,
-            // ])
-            // ->add('newOrganisation', OrganisationType::class, [
-            //     'mapped' => false,
-            //     'required' => false,
-            //     'label' => 'Ou créer une nouvelle organisation',
-            // ])
-            ->add('location', EntityType::class, [
-                'class' => Location::class,
-                'choice_label' => 'name',
-                'placeholder' => '— Sélectionner un lieu —',
-                'required' => true,
+            ->add('file', FileType::class, [
+                'label' => 'Affiche',
+                'mapped' => true,
+                'constraints' => [
+                    new Assert\File([
+                        'maxSize' => '2M',
+                        'maxSizeMessage' => 'Le fichier ne doit pas dépasser {{ limit }} Mo',
+                        'mimeTypes' => [
+                            'application/pdf',
+                            'image/jpeg',
+                            'image/png',
+                        ],
+                        'mimeTypesMessage' => 'Le fichier doit être de type PDF, JPG ou PNG.',
+                    ]),
+                ],
+                'required' => false,
             ])
         ;
     }
