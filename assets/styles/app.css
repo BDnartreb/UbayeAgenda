@@ -271,6 +271,11 @@ body {
   display: block;
 }
 
+#toggle-date:checked ~ .filter-options {
+    display: block;
+}
+
+
 /* Style des titres pour qu’ils ressemblent à des boutons */
 .filter-title {
   display: block;

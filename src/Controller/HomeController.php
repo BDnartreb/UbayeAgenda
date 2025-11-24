@@ -55,7 +55,12 @@ final class HomeController extends AbstractController
         $selectedThematics = $request->query->all('thematics');
         $selectedFees = $request->query->all('fees');
         $selectedPublics = $request->query->all('publics');
-        $selectedTowns = $request->query->all('towns'); 
+        $selectedTowns = $request->query->all('towns');
+        $selectedDate = $request->query->get('selectedDate');
+        if(!$selectedDate){
+            $today = new \DateTime('today');
+            $selectedDate = $today->format('Y-m-d');
+        }
 
         $selectedOrganisations = $request->query->all('organisations');
             $selectedOrganisationsId = [];
@@ -71,15 +76,15 @@ final class HomeController extends AbstractController
                 $selectedLocationsId[] = $locationId;
             }
 
-
         //events selected
-        $events = $eventRepository->findEventsByFiltersOrderedByStartDateFromToday(
+        $events = $eventRepository->findEventsByFiltersOrderedByStartDate(
             fees: $selectedFees,
             thematics: $selectedThematics,
             publics: $selectedPublics,
             towns: $selectedTowns,
             organisations: $selectedOrganisationsId,
             locations: $selectedLocationsId,
+            date: $selectedDate,
         );
 
         $noEventSelectedMessage = null;
@@ -103,6 +108,7 @@ final class HomeController extends AbstractController
             'selectedTowns' => $selectedTowns,            
             'selectedOrganisations' => $selectedOrganisations,            
             'selectedLocations' => $selectedLocations,
+            'selectedDate' => $selectedDate,
             'noEventSelectedMessage' => $noEventSelectedMessage,
         ]);
     }

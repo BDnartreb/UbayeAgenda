@@ -7,6 +7,7 @@ use App\Enum\FeeEnum;
 use App\Enum\PublicEnum;
 use App\Enum\ThematicEnum;
 use App\Enum\TownEnum;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -47,18 +48,16 @@ class EventRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findEventsByFiltersOrderedByStartDateFromToday(
+    public function findEventsByFiltersOrderedByStartDate(
         array $organisations = [],
         array $thematics = [],
         array $fees = [],
         array $publics = [],
         array $towns = [],
         array $locations = [],
+        string $date,
          ): array
         {
-            //dd($fees);
-            $today = new \DateTime('today');
-
             $qb = $this->createQueryBuilder('e')
                 ->leftJoin('e.location', 'l') 
                 ->addSelect('l');;;
@@ -96,9 +95,12 @@ class EventRepository extends ServiceEntityRepository
                     ->setParameter('locations', $locations);
             }
 
-            return $qb->andWhere('e.startDate >= :today')
-                ->setParameter('today', $today)
-                ->orderBy('e.startDate', 'ASC')
+            if (!empty($date)) {
+                $qb->andWhere('e.startDate >= :date')
+                    ->setParameter('date', new \DateTime($date));
+            }
+
+            return $qb->orderBy('e.startDate', 'ASC')
                 ->getQuery()
                 ->getResult();
         }

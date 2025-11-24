@@ -66,65 +66,53 @@ final class EventController extends AbstractController
     //     return $this->render('/organisation/eventForm.html.twig', ['form' => $form]);
     // }
 
-
-
-
-
-
-
     #[Route('/organisation/event/add', name: 'organisation_event_add', methods: ['GET', 'POST'])]
-public function add(Request $request, SessionInterface $session): Response
-{
-    $event = new Event();
-    $organisation = $this->getUser();
-    $event->setOrganisation($organisation);
+    public function add(Request $request, SessionInterface $session): Response
+    {
+        $event = new Event();
+        $organisation = $this->getUser();
+        $event->setOrganisation($organisation);
 
-    // Récupérer les données sauvegardées en session si elles existent
-    $savedData = $session->get('event_form_data', []);
-    if (!empty($savedData)) {
-        $form = $this->createForm(EventType::class, $event);
-        $form->submit($savedData); // pré-remplir le formulaire avec les données
-    } else {
-        $form = $this->createForm(EventType::class, $event);
-    }
-
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Gestion du fichier
-        $file = $event->getFile();
-        if ($file !== null) {
-            $filename = md5(uniqid()) . '.' . $file->guessExtension();
-            $event->setPoster('uploads/' . $filename);
-            $event->getFile()->move('uploads/', $filename);
+        // Récupérer les données sauvegardées en session si elles existent
+        $savedData = $session->get('event_form_data', []);
+        if (!empty($savedData)) {
+            $form = $this->createForm(EventType::class, $event);
+            $form->submit($savedData); // pré-remplir le formulaire avec les données
+        } else {
+            $form = $this->createForm(EventType::class, $event);
         }
 
-        $this->em->persist($event);
-        $this->em->flush();
+        $form->handleRequest($request);
 
-        // Nettoyer les données en session après enregistrement
-        $session->remove('event_form_data');
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Gestion du fichier
+            $file = $event->getFile();
+            if ($file !== null) {
+                $filename = md5(uniqid()) . '.' . $file->guessExtension();
+                $event->setPoster('uploads/' . $filename);
+                $event->getFile()->move('uploads/', $filename);
+            }
 
-        $this->addFlash('success', 'Événement créé avec succès !');
-        return $this->redirectToRoute('event', ['id' => $event->getId()]);
+            $this->em->persist($event);
+            $this->em->flush();
+
+            // Nettoyer les données en session après enregistrement
+            $session->remove('event_form_data');
+
+            $this->addFlash('success', 'Événement créé avec succès !');
+            return $this->redirectToRoute('event', ['id' => $event->getId()]);
+        }
+
+        // Si l'utilisateur clique sur "Créer un nouveau lieu", sauvegarder les données dans la session
+        if ($request->query->get('save_session') === '1') {
+            $session->set('event_form_data', $request->request->get('event'));
+            return $this->redirectToRoute('organisation_location_add');
+        }
+
+        return $this->render('/organisation/eventForm.html.twig', [
+            'form' => $form,
+        ]);
     }
-
-    // Si l'utilisateur clique sur "Créer un nouveau lieu", sauvegarder les données dans la session
-    if ($request->query->get('save_session') === '1') {
-        $session->set('event_form_data', $request->request->get('event'));
-        return $this->redirectToRoute('organisation_location_add');
-    }
-
-    return $this->render('/organisation/eventForm.html.twig', [
-        'form' => $form,
-    ]);
-}
-
-
-
-
-
-
 
     #[Route('/organisation/location/add', name: 'organisation_location_add', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function organisationLocationAdd(Request $request): Response

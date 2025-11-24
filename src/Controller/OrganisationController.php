@@ -78,7 +78,7 @@ final class OrganisationController extends AbstractController
             $this->em->persist($organisation);
             $this->em->flush();
 
-            return $this->redirectToRoute('home');
+            return $this->redirectToRoute('organisation');
         }
 
         return $this->render('home/register.html.twig', [

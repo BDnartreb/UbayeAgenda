@@ -6,7 +6,7 @@
     <div class="main-container">
         <div class="filter-container">
             {% if app.user %}
-                <div><h1>Bienvenue {{ app.user.firstName }} !</h1></div>
+                <div><h1>Bienvenue {{ app.user.name }} !</h1></div>
             {% endif %}
             <div><h2>Filtrer par :</h2></div>
 
@@ -118,7 +118,29 @@
                         {% endfor %}
                     </div>
                 </div>
-            <button type="submit" class="btn btn-danger">Filtrer</button>
+
+                {% set today = 'now'|date('Y-m-d') %}
+                <div class="filter-group">
+                    <input 
+                        type="checkbox" 
+                        id="toggle-date" 
+                        hidden
+                        {% if selectedDate != today %}checked{% endif %}
+                    >
+
+                    <label for="toggle-date" class="filter-title">Date</label>
+
+                    <div class="filter-options">
+                        <input 
+                            type="date"
+                            id="selectedDate"
+                            name="selectedDate"
+                            value="{{ selectedDate }}"
+                        >
+                    </div>
+                </div>
+
+             <button type="submit" class="btn btn-danger">Filtrer</button>
             {# <button type="button" id="reset-filters" class="btn btn-secondary">Réinitialiser</button> #}
             </form>
         </div>
@@ -146,9 +168,11 @@
                     <div class="events">
                         <a href="{{ path('event', {'id': event.getId()}) }}">
                             <div class="event-card">
-                                <div class="event-poster">
-                                    <img src="{{ event.poster }}" alt="Affiche de l'événement">
-                                </div>
+                                {% if event.poster is not empty %}
+                                    <div class="event-poster">
+                                        <img src="{{ asset(event.poster) }}" alt="Affiche de l'événement">
+                                    </div>
+                                {% endif %}
                                 <div class="event-info">
                                     <div class="event-name"><h2>{{ event.name }}</h2></div>
                                     {% if event.endDate is null %}
