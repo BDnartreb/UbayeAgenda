@@ -13,6 +13,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class HomeController extends AbstractController
@@ -138,4 +140,17 @@ final class HomeController extends AbstractController
         ]);
     }
 
+#[Route('/test-mail')]
+public function test(MailerInterface $mailer): Response
+{
+    $email = (new Email())
+        ->from('from@example.com')
+        ->to('to@example.com')
+        ->subject('Test Mailpit')
+        ->text('Hello Mailpit !');
+
+    $mailer->send($email);
+
+    return new Response('Email envoyé → http://localhost:8025');
+}
 }
