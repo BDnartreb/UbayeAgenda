@@ -11,7 +11,7 @@
             <div><h2>Filtrer par :</h2></div>
 
             <form id="filters-form" method="get" action="{{ path('eventlist') }}">
-                <div class="filter-group">
+                {# <div class="filter-group">
                     <input type="checkbox" id="toggle-organisateur" hidden>
                     <label for="toggle-organisateur" class="filter-title">Organisateur</label>
                     <div class="filter-options {% if selectedOrganisations is not empty %}open{% endif %}">
@@ -27,7 +27,7 @@
                             </label><br>
                         {% endfor %}
                     </div>
-                </div>
+                </div> #}
 
                 <div class="filter-group">
                     <input type="checkbox" id="toggle-thematic" hidden>

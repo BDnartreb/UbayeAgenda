@@ -43,8 +43,8 @@ class Event
 
     #[Assert\File (
         maxSize: '2M',
-        mimeTypes: ['application/pdf', 'image/jpeg', 'image/png'],
-        mimeTypesMessage: 'Veuillez télécharger un fichier de format PDF, JPG ou PNG.',
+        mimeTypes: ['image/jpeg', 'image/png'],
+        mimeTypesMessage: 'Veuillez télécharger un fichier de format JPG ou PNG.',
         maxSizeMessage: 'Le fichier ne peut pas dépasser 2 Mo.',
     )]
     private ?UploadedFile $file = null;

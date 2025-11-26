@@ -4,8 +4,8 @@ namespace App\Enum;
 
 enum PublicEnum: string
 {
-    case All = 'Tout public';
-    case Child = 'Enfant';
-    case Teen = 'Adolescent';
-    case Adult = 'Adulte';
+    case ALL = 'Tout public';
+    case CHILD = 'Enfant';
+    case TEEN = 'Jeune';
+    case ADULT = 'Adulte';
 }

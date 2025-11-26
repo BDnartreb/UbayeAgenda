@@ -82,7 +82,7 @@ class TestFixtures extends Fixture implements FixtureGroupInterface
         $admin->setRoles(["ROLE_ADMIN"]);
         //$admin->setPassword($this->userPasswordHasher->hashPassword($admin, $_ENV['ADMIN_PASSWORD']));
         $admin->setPassword($this->userPasswordHasher->hashPassword($admin, $this->params->get('admin_password')));
-        $admin->setStatus(StatusEnum::INDIVIDUAL);
+        $admin->setStatus(StatusEnum::PROFESSIONAL);
         
         $manager->persist($admin); 
 
@@ -96,7 +96,7 @@ class TestFixtures extends Fixture implements FixtureGroupInterface
         $orgaTest->setLastName("ORGATEST");
         $orgaTest->setRoles(["ROLE_ORGANISATION"]);
         $orgaTest->setPassword($this->userPasswordHasher->hashPassword($orgaTest, 'password'));
-        $orgaTest->setStatus(StatusEnum::INDIVIDUAL);
+        $orgaTest->setStatus(StatusEnum::PROFESSIONAL);
 
         $manager->persist($orgaTest);    
 
@@ -110,7 +110,7 @@ class TestFixtures extends Fixture implements FixtureGroupInterface
         $orgaTest2->setLastName("ORGATEST2");
         $orgaTest2->setRoles(["ROLE_ORGANISATION"]);
         $orgaTest2->setPassword($this->userPasswordHasher->hashPassword($orgaTest2, 'password'));
-        $orgaTest2->setStatus(StatusEnum::INDIVIDUAL);
+        $orgaTest2->setStatus(StatusEnum::PROFESSIONAL);
 
         $manager->persist($orgaTest2);    
 

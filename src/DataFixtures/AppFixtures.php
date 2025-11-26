@@ -83,7 +83,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         $admin->setRoles(["ROLE_ADMIN"]);
         //$admin->setPassword($this->userPasswordHasher->hashPassword($admin, $_ENV['ADMIN_PASSWORD']));
         $admin->setPassword($this->userPasswordHasher->hashPassword($admin, $this->params->get('admin_password')));
-        $admin->setStatus(StatusEnum::INDIVIDUAL);
+        $admin->setStatus(StatusEnum::PROFESSIONAL);
         
         $manager->persist($admin); 
 
@@ -97,7 +97,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         $test->setLastName("ORGATEST");
         $test->setRoles(["ROLE_ORGANISATION"]);
         $test->setPassword($this->userPasswordHasher->hashPassword($test, 'password'));
-        $test->setStatus(StatusEnum::INDIVIDUAL);
+        $test->setStatus(StatusEnum::PROFESSIONAL);
 
         $manager->persist($test);    
 

@@ -55,7 +55,7 @@ class ProdFixtures extends Fixture implements FixtureGroupInterface
         $admin->setLastName("");
         $admin->setRoles(["ROLE_ADMIN"]);
         $admin->setPassword($this->userPasswordHasher->hashPassword($admin, $_ENV['ADMIN_PASSWORD']));
-        $admin->setStatus(StatusEnum::INDIVIDUAL);
+        $admin->setStatus(StatusEnum::PROFESSIONAL);
 
         $manager->persist($admin);    
 

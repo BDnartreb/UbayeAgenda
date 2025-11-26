@@ -83,11 +83,10 @@ class EventType extends AbstractType
                         'maxSize' => '2M',
                         'maxSizeMessage' => 'Le fichier ne doit pas dépasser {{ limit }} Mo',
                         'mimeTypes' => [
-                            'application/pdf',
                             'image/jpeg',
                             'image/png',
                         ],
-                        'mimeTypesMessage' => 'Le fichier doit être de type PDF, JPG ou PNG.',
+                        'mimeTypesMessage' => 'Le fichier doit être de type JPG ou PNG.',
                     ]),
                 ],
                 'required' => false,
