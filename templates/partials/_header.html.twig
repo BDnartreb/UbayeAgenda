@@ -1,5 +1,8 @@
     <header>
         {# <nav class="navbar navbar-expand-lg custom-navbar"> #}
+        {# {{ dump(app.request.attributes.get('_route')) }} #}
+        {% set current = app.current_route %}
+
         <nav class="navbar custom-navbar">
             <div class="header-container">
                 <div class="logo">
@@ -13,18 +16,18 @@
                     <div class="collapse navbar-collapse" id="menu">
                         <ul class="navbar-nav menu-links">
                             <li class="navbar-item">
-                                <a href="{{ path('home') }}" class="nav-link">Agenda</a>
+                                <a href="{{ path('home') }}" class="nav-link {{ current == 'eventlist' ? 'active' : '' }}">Agenda</a>
                                 {% if app.user is null %}
-                                    <a href="{{ path('login') }}" class="nav-link">Connexion</a>
+                                    <a href="{{ path('login') }}" class="nav-link {{ current == 'login' ? 'active' : '' }}">Connexion</a>
                                 {% endif %}
                                 {% if is_granted('ROLE_ORGANISATION') %}
-                                    <a href="{{ path('organisation') }}" class="nav-link">Organisation</a>
-                                    <a href="{{ path('organisation_event_add') }}" class="nav-link">Créer un événement</a>
+                                    <a href="{{ path('organisation') }}" class="nav-link {{ current == 'organisation' ? 'active' : '' }}">Organisation</a>
+                                    <a href="{{ path('organisation_event_add') }}" class="nav-link {{ current == 'organisation_event_add' ? 'active' : '' }}">Créer un événement</a>
                                     <a href="{{ path('logout') }}" class="nav-link">Déconnexion</a>
                                 {% endif %}
                                 {% if is_granted('ROLE_ADMIN') %}
-                                    <a href="{{ path('admin_organisations') }}" class="nav-link">Organisations</a>
-                                    <a href="{{ path('admin_events') }}" class="nav-link">Evénements</a>
+                                    <a href="{{ path('admin_organisations') }}" class="nav-link {{ current == 'admin_organisations' ? 'active' : '' }}">Organisations</a>
+                                    <a href="{{ path('admin_events') }}" class="nav-link {{ current == 'admin_events' ? 'active' : '' }}">Evénements</a>
                                     <a href="{{ path('logout') }}" class="nav-link">Déconnexion</a>
                                 {% endif %}
                             </li> 

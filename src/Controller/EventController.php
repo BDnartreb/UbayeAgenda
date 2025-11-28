@@ -35,37 +35,6 @@ final class EventController extends AbstractController
         ]);
     }
 
-    // #[Route('/organisation/event/add', name: 'organisation_event_add', methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    // public function add(Request $request): Response
-    // {
-    //     $event = new Event();
-    //     $organisation = $this->getUser();
-    //     $event->setOrganisation($organisation);
-    //     $form = $this->createForm(EventType::class, $event);
-    //     $form->handleRequest($request);  
-       
-    //     if ($form->isSubmitted() && $form->isValid())
-    //     {
-    //         //$event->setOrganisation($organisation);
-
-    //         $file = $event->getFile();
-    //         if ($file != null) {
-    //             $filename = md5(uniqid()) . '.' . $file->guessExtension();
-    //             $event->setPoster('uploads/' . $filename);
-    //             $event->getFile()->move('uploads/', $filename);
-    //         }
-           
-    //         $this->em->persist($event);
-    //         $this->em->flush();
-
-    //         $this->addFlash('success', 'Événement créé avec succès !');
-
-    //         return $this->redirectToRoute('event', ['id' => $event->getId()]);
-    //     }
-
-    //     return $this->render('/organisation/eventForm.html.twig', ['form' => $form]);
-    // }
-
     #[Route('/organisation/event/add', name: 'organisation_event_add', methods: ['GET', 'POST'])]
     public function add(Request $request, SessionInterface $session): Response
     {
@@ -132,6 +101,47 @@ final class EventController extends AbstractController
         }
 
         return $this->render('/organisation/locationForm.html.twig', ['form' => $form]);
+    }
+
+    #[Route('/organisation/location/update/{id}', name: 'organisation_location_update', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function organisationLocationUpdate(int $id, Request $request): Response
+    {
+        $location = $this->em->getRepository(Location::class)->find($id);
+        if(!$location){
+            throw $this->createNotFoundException('Ce lieu n\'existe pas.');
+        }
+
+        $form = $this->createForm(LocationType::class, $location);
+        $form->handleRequest($request);  
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $this->em->persist($location);
+            $this->em->flush();
+
+            $this->addFlash('success', 'Lieu modifié avec succès !');
+
+            return $this->redirectToRoute('organisation_event_add');
+        }
+
+        return $this->render('/organisation/locationForm.html.twig', ['form' => $form]);
+    }
+
+    // Pb delete impossible avec lien avec event
+    #[Route('/admin/location/delete/{id}', name: 'admin_location_delete', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function organisationLocationDelete(int $id, Request $request): Response
+    {
+        $location = $this->em->getRepository(Location::class)->find($id);
+        if(!$location){
+            throw $this->createNotFoundException('Ce lieu n\'existe pas.');
+        }
+
+        $this->em->remove($location);
+        $this->em->flush();
+
+        $this->addFlash('success', 'Lieu supprimé avec succès !');
+
+        return $this->redirectToRoute('organisation_event_add');
     }
 
     // User on his own event
@@ -235,42 +245,63 @@ final class EventController extends AbstractController
         return $this->redirectToRoute('admin_events');
     }
 
-    /**
-     * Show list of events proposed by the organisation
-     */
-    #[Route('/organisation/events', name: 'organisation_events')]
-    public function userEvents(): Response
-    {
-        /** @var Organisation $organisation */
-        $organisation = $this->getUser();
-        $events = $this->em->getRepository(Event::class)->findBy(['email' => $organisation->getEmail()]);
+    // /**
+    //  * Show list of events proposed by the organisation
+    //  */
+    // #[Route('/organisation/events', name: 'organisation_events')]
+    // public function userEvents(): Response
+    // {
+    //     /** @var Organisation $organisation */
+    //     $organisation = $this->getUser();
+    //     $events = $this->em->getRepository(Event::class)->findBy(['email' => $organisation->getEmail()]);
 
-        return $this->render('organisation/organisation.html.twig', [
-            'organisation' => $organisation,
-            'events' => $events,
-        ]);
-    }
+    //     return $this->render('organisation/organisation.html.twig', [
+    //         'organisation' => $organisation,
+    //         'events' => $events,
+    //     ]);
+    // }
 
     /**
      * Show list of events for admin
      */
     #[Route('/admin/events', name: 'admin_events')]
-    public function adminEvents(): Response
+    public function adminEvents(Request $request): Response
     {
         /** @var Organisation $organisation */
         $connectedUser = $this->getUser();
-        $admin = $this->em->getRepository(Organisation::class)->findOneBy(['email' => 'admin@uabyeagenda.com']);
+        $admin = $this->em->getRepository(Organisation::class)->findOneBy(['email' => 'admin@ubayeagenda.com']);
 
         if ($connectedUser === $admin){
-            $events = $this->em->getRepository(Event::class)->findAll();
+            $organisations = $this->em->getrepository(Organisation::class)->findAll();
+            $selectedOrganisations = $request->query->all('organisations');
+            $selectedOrganisationsId = [];
+            foreach ($selectedOrganisations as $orgaName) {
+                $organisationId = $this->em->getRepository(Organisation::class)->findOneBy(['name' => $orgaName])->getId();
+                $selectedOrganisationsId[] = $organisationId;
+            }
 
+
+            $selectedDate = $request->query->get('selectedDate');
+            if(!$selectedDate){
+                $today = new \DateTime('today');
+                $selectedDate = $today->format('Y-m-d');
+            }
+
+            $events = $this->em->getRepository(Event::class)
+            ->findEventsOrderedByStartDateFromSelectedDate(
+                organisations: $selectedOrganisationsId,
+                date: $selectedDate
+            );
+       
             return $this->render('admin/events.html.twig', [
                 'events' => $events,
+                'organisations' => $organisations,
+                'selectedOrganisations' => $selectedOrganisations,
+                'selectedDate' => $selectedDate,
             ]);
         }
 
         return $this->redirectToRoute('/');
     }
 
-  
 }

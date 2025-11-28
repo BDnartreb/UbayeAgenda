@@ -140,17 +140,17 @@ final class HomeController extends AbstractController
         ]);
     }
 
-#[Route('/test-mail')]
-public function test(MailerInterface $mailer): Response
-{
-    $email = (new Email())
-        ->from('from@example.com')
-        ->to('to@example.com')
-        ->subject('Test Mailpit')
-        ->text('Hello Mailpit !');
+    #[Route('/test-mail')]
+    public function test(MailerInterface $mailer): Response
+    {
+        $email = (new Email())
+            ->from('from@example.com')
+            ->to('to@example.com')
+            ->subject('Test Mailpit')
+            ->text('Hello Mailpit !');
 
-    $mailer->send($email);
+        $mailer->send($email);
 
-    return new Response('Email envoyé → http://localhost:8025');
-}
+        return new Response('Email envoyé → http://localhost:8025');
+    }
 }

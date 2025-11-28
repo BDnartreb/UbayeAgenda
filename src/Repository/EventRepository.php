@@ -48,6 +48,28 @@ class EventRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+      public function findEventsOrderedByStartDateFromSelectedDate(
+        array $organisations = [],
+        string $date
+         ): array
+        {
+            $qb = $this->createQueryBuilder('e');
+
+            if (!empty($organisations)) {
+                $qb->andWhere('e.organisation IN (:organisations)')
+                    ->setParameter('organisations', $organisations);
+            }
+
+            if (!empty($date)) {
+                $qb->andWhere('e.startDate >= :date')
+                    ->setParameter('date', new \DateTime($date));
+            }
+
+            return $qb->orderBy('e.startDate', 'ASC')
+                ->getQuery()
+                ->getResult();
+        }
+
     public function findEventsByFiltersOrderedByStartDate(
         array $organisations = [],
         array $thematics = [],

@@ -1,24 +1,38 @@
-{% extends 'admin.html.twig' %}
+{% extends 'front.html.twig' %}
 
 {% block title %}Organisations{% endblock %}
 
 {% block content %}
     <div class="main-container">
-        <div class="left-container">Filtres</div>
-        <div class="agenda-container">
-            <div class="day-container">
-                {% for organisation in organisations %}
-                <div class="day">
-                    <div class="orga_name"><h1> {{ organisation.name }} </h1></div>
-                    <a href="{{ path('admin_organisation_update', {'id': organisation.id}) }}">Modifier</a>
-                    <form method="post" action="{{ path('admin_organisation_delete', {'id': organisation.id}) }}" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer cette organisation ?');">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ organisation.id) }}">
-                        <button type="submit" class="btn-link">Supprimer</button>
-                    </form>
-                </div>
-                {% endfor %}
-            </div> 
+        <div class="left-container">
+            {% if app.user %}
+                <div><h1>Bienvenue {{ app.user.name }} !</h1></div>
+            {% endif %}
         </div>
+        <div class="central-container">
+            {% for organisation in organisations %}
+                <div class="item-container">
+
+                    <div class="orga-small-card">
+                        <div class="orga-small-card-data">
+                            <div class=""><h2> {{ organisation.name }} </h2></div>
+                            <div class=""><h4>{{ organisation.address }} - {{ organisation.town.value }} - 
+                        {{ organisation.email }} - {{ organisation.phone }} - {{ organisation.status.value }}</h4></div>
+                            <div class=""><h4>{{ organisation.firstName }} - {{ organisation.lastName }}</h4></div>
+                        </div>
+                    </div>
+
+                    <div class="btn-container">
+                        <div>
+                            <form method="post" action="{{ path('admin_organisation_delete', {'id': organisation.id}) }}" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer cet organisation ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ organisation.id) }}">
+                                <button type="submit" class="btn-link btn-link-delete">Supprimer</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div> 
     </div>
 
 {% endblock %}

@@ -4,31 +4,13 @@
 
 {% block content %}
     <div class="main-container">
-        <div class="filter-container">
+        <div class="left-container">
             {% if app.user %}
                 <div><h1>Bienvenue {{ app.user.name }} !</h1></div>
             {% endif %}
             <div><h2>Filtrer par :</h2></div>
 
             <form id="filters-form" method="get" action="{{ path('eventlist') }}">
-                {# <div class="filter-group">
-                    <input type="checkbox" id="toggle-organisateur" hidden>
-                    <label for="toggle-organisateur" class="filter-title">Organisateur</label>
-                    <div class="filter-options {% if selectedOrganisations is not empty %}open{% endif %}">
-                        {% for organisation in organisations %}
-                            <label>
-                                <input 
-                                    type="checkbox" 
-                                    name="organisations[]" 
-                                    value="{{ organisation.name }}"
-                                    {% if organisation.name in selectedOrganisations %}checked{% endif %}
-                                >
-                                {{ organisation.name }}
-                            </label><br>
-                        {% endfor %}
-                    </div>
-                </div> #}
-
                 <div class="filter-group">
                     <input type="checkbox" id="toggle-thematic" hidden>
                     <label for="toggle-thematic" class="filter-title">Thématique</label>
@@ -145,54 +127,50 @@
             </form>
         </div>
 
-       <div class="agenda-container">
-            <div class="day-container">
+        <div class="central-container">
+            {% set currentDate = null %}
 
-                {% set currentDate = null %}
+            {% if events is empty %}
+                <h1>{{ noEventSelectedMessage }}</h1>
+            {% endif %}
 
-                {% if events is empty %}
-                    <h1>{{ noEventSelectedMessage }}</h1>
+            {% for event in events %}
+                {% set eventDate = event.startDate|date('Y-m-d') %}
+
+                {% if eventDate != currentDate %}
+                    <div class="date">
+                        {# <div class="day-before"><h1><i class="fa-solid fa-caret-left"></i></h1></div> #}
+                        <div class="date"><h1>{{ event.startDate|fr_date('l j F Y') }}</h1></div>
+                        {# <div class="day-after"><h1><i class="fa-solid fa-caret-right"></i></h1></div> #}
+                    </div>                                  
                 {% endif %}
 
-                {% for event in events %}
-                    {% set eventDate = event.startDate|date('Y-m-d') %}
-
-                    {% if eventDate != currentDate %}
-                        <div class="day">
-                            {# <div class="day-before"><h1><i class="fa-solid fa-caret-left"></i></h1></div> #}
-                            <div class="day"><h1>{{ event.startDate|date('l j F Y') }}</h1></div>
-                            {# <div class="day-after"><h1><i class="fa-solid fa-caret-right"></i></h1></div> #}
-                        </div>                                  
-                    {% endif %}
-
-                    <div class="events">
-                        <a href="{{ path('event', {'id': event.getId()}) }}">
-                            <div class="event-card">
-                                {% if event.poster is not empty %}
-                                    <div class="event-poster">
-                                        <img src="{{ asset(event.poster) }}" alt="Affiche de l'événement">
-                                    </div>
-                                {% endif %}
-                                <div class="event-info">
-                                    <div class="event-name"><h2>{{ event.name }}</h2></div>
-                                    {% if event.endDate is null %}
-                                    <div class="event-time-location"><h3>{{ event.startDate|date('H:i') }} - {{ event.location.name }} - {{ event.location.town.value }}</h3></div>
-                                    {% else %}
-                                    <div class="event-time-location"><h3>de {{ event.startDate|date('H:i') }} à {{ event.endDate|date('H:i') }} - {{ event.location.name }} - {{ event.location.town.value }}</h3></div>
-                                    {% endif  %}
-                                    <div class="event-organizer"><h4>Présenté par : {{ event.organisation.name }}</h4></div>
-                                    <div class="event-moreinfo"><h5>{{ event.thematic.value }} - {{ event.fee.value }} - Public : {{ event.public.value }}</h5></div>
+                <div class="event">
+                    <a href="{{ path('event', {'id': event.getId()}) }}">
+                        <div class="event-medium-card">
+                            {% if event.poster is not empty %}
+                                <div class="event-poster">
+                                    <img src="{{ asset(event.poster) }}" alt="Affiche de l'événement">
                                 </div>
+                            {% endif %}
+                            <div class="event-medium-card-data">
+                                <div class=""><h2>{{ event.name }}</h2></div>
+                                {% if event.endDate is null %}
+                                <div class=""><h3>{{ event.startDate|date('H:i') }} -  {{ event.location.name }} - {{ event.location.town.value }}</h3></div>
+                                {% else %}
+                                <div class=""><h3>de {{ event.startDate|date('H:i') }} à {{ event.endDate|date('H:i') }} - {{ event.location.name }} - {{ event.location.town.value }}</h3></div>
+                                {% endif  %}
+                                <div class=""><h4>Présenté par : {{ event.organisation.name }}</h4></div>
+                                <div class=""><h5>{{ event.thematic.value }} - {{ event.fee.value }} - Public : {{ event.public.value }}</h5></div>
                             </div>
-                        
-                        </a>
-                    </div>
+                        </div>
+                    </a>
+                </div>
 
-                    {% set currentDate = eventDate %}
-                    
-                {% endfor %}
-            </div> 
-        </div>
+                {% set currentDate = eventDate %}
+                
+            {% endfor %}
+        </div> 
     </div>
 {% endblock %}
 

@@ -1,5 +1,21 @@
 {% extends 'front.html.twig' %}
 
+{% block og_title %}{{ event.name }}{% endblock %}
+{% block og_description %}
+    {{ event.location.name }} - {{ event.location.town.value }} – Le {{ event.startDate|date('d/m/Y à H:i') }}
+    {{ event.thematic.value }} - {{ event.fee.value }} - {{ event.public.value }}
+{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_url %}{{ absolute_url(path('event', {'id': event.id})) }}{% endblock %}
+{% block og_image %}
+    {% if event.poster %}
+        {{ absolute_url(asset(event.poster)) }}
+    {% else %}
+        {{ absolute_url(asset('images/default-preview.jpg')) }}
+    {% endif %}
+{% endblock %}
+
+
 {% block title %}Event Name{% endblock %}
 
 {% block content %}
@@ -12,21 +28,21 @@
             </div>
         {% endif %}
         <div class="event-description-card">
-            <div class="description-card-name"><h1>{{ event.name }}</h2></div>
-            <div class="description-card-time-location"><h2>{{ event.startDate|date('l j F Y') }}</h2></div>
-            <div class="description-card-time-location"><h3>{{ event.startDate|date('H:i') }} {% if event.endDate %} à {{ event.endDate|date('H:i') }} {% endif %}</h3></div>
-            <div class="description-card-time-location"><h3>{{ event.location.name }} - {{ event.location.town.value }}</h3></div>
-            <div class="description-card-time-location"><h4>{{ event.location.address }}</h4></div>
-            <div class="description-card-organizer"><h4>Présenté par : {{ event.organisation.name }}</h4></div>
-            <div class="description-card-description"><h4>Description : </h4></div>
+            <div class=""><h1>{{ event.name }}</h2></div>
+            <div class=""><h2>{{ event.startDate|date('l j F Y') }}</h2></div>
+            <div class=""><h3>{{ event.startDate|date('H:i') }} {% if event.endDate %} à {{ event.endDate|date('H:i') }} {% endif %}</h3></div>
+            <div class=""><h3>{{ event.location.name }} - {{ event.location.town.value }}</h3></div>
+            <div class=""><h4>{{ event.location.address }}</h4></div>
+            <div class=""><h4>Présenté par : {{ event.organisation.name }}</h4></div>
+            <div class=""><h4>Description : </h4></div>
                 <label class="clamp-wrapper"><input type="checkbox" hidden id="toggle-text">
                 <div class="clamp3">{{ event.description }}</div>
                 </label>
-            <div class="description-card-comment"><h4>Commentaires : </h4></div>
+            <div class=""><h4>Commentaires : </h4></div>
                 <label class="clamp-wrapper"><input type="checkbox" hidden id="toggle-text">
                 <div class="clamp3">{{ event.comment }}</div>
                 </label>  
-            <div class="description-card-moreinfo"><h4>{{ event.thematic.value }} - {{ event.fee.value }} - Public : {{ event.public.value }}</h4></div>
+            <div class=""><h4>{{ event.thematic.value }} - {{ event.fee.value }} - Public : {{ event.public.value }}</h4></div>
             {% if app.user is same as(event.organisation) %} 
                 <a href="{{ path('organisation_event_update', {'id': event.id}) }}" class="btn-link btn-link-modify">Modifier</a>
             {% endif %}

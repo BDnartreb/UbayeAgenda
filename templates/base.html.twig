@@ -4,6 +4,20 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Ubaye Agenda!{% endblock %}</title>
+
+        {# ================== Link Preview: Open Graph (Facebook, WhatsApp, Messenger) ================== #}
+        <meta property="og:title" content="{% block og_title %}Ubaye Agenda — Tous les événements{% endblock %}">
+        <meta property="og:description" content="{% block og_description %}Découvrez les sorties et événements de la vallée de l’Ubaye.{% endblock %}">
+        <meta property="og:image" content="{% block og_image %}{{ absolute_url(asset('images/default-preview.jpg')) }}{% endblock %}">
+        <meta property="og:url" content="{% block og_url %}{{ app.request.uri }}{% endblock %}">
+        <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+
+        {# ================== Link Preview: Twitter Card (Twitter/X) ================== #}
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{% block twitter_title %}{{ block('og_title') }}{% endblock %}">
+        <meta name="twitter:description" content="{% block twitter_description %}{{ block('og_description') }}{% endblock %}">
+        <meta name="twitter:image" content="{% block twitter_image %}{{ block('og_image') }}{% endblock %}">
+
         
         {# <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>"> #}
         

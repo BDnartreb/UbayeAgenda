@@ -65,17 +65,6 @@
     gap: 20px;
 }
 
-/* .nav-link {
-    font-size: 1.1rem;
-    text-decoration: none;
-    color: orange;
-    background-color: rgba(0, 132, 255, 0.3);
-    border-radius: 4px;
-    padding: 2px 7px 2px 7px;
-    text-shadow: black;
-} */
-
-
 .nav-link {
     display: inline-block;
     padding: 5px 20px;
@@ -83,9 +72,17 @@
     background-color: #ff7f50;
     text-decoration: none;
     font-size: 1rem;
-    /* font-weight: bold; */
     border-radius: 8px;
 }
+
+.nav-link.active {
+    font-weight: bold;
+    color: rgb(88, 88, 88) !important;
+    font-style: italic;
+    /* color: #ff7f50; */
+    /* border-bottom: 2px solid #ff7f50; */
+}
+
 
 /* .navbar-collapse {
     display: flex;
@@ -128,7 +125,9 @@
 
 /**************** BUTTON ****************/
 .btn-link {
-    display: inline-block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 5px 20px;
     color: white;
     text-decoration: none;
@@ -137,13 +136,16 @@
     border-radius: 8px;
     transition: all 0.3s ease;      /* transition douce pour hover */
     box-shadow: 0 3px 6px rgba(0,0,0,0.2); /* léger relief */
+    border: none;
 }
 
 .btn-link-modify {
+    width: 100px;
     background-color: #ff7f50;
 }
 
 .btn-link-delete {
+    width: 100px;
     background-color: red;
 }
 
@@ -170,44 +172,46 @@ body {
     flex: 1; /* prend tout l’espace restant entre le header etle footer */
 }
 
-/**************** HOME PAGES ****************/
+/**************** CONTAINERS ****************/
 .main-container {
     display: flex;
     flex-direction: row;
     justify-content: center;
 }
 
-.standard-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 50%;
-    padding: 30px 0px 30px 0px;
-}
-
-/**************** PAGE EVENTLIST ****************/
-
-.filter-container {
+.left-container {
     width: 25vw;
     display: flex;
     flex-direction: column;
-    margin: 5px;
-    padding: 30px;
+    margin: 5px 0px 5px 5px;
+    padding: 10px 30px 10px 30px;
     background-color: rgb(245, 242, 238);;
     border-radius: 20px;      
 }
 
-.agenda-container{
+.central-container{
+    display: flex;
+    flex-direction: column;
     width: 75vw;
 }
 
-.day-container {
+.item-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    margin:5px 5px 0px 5px;
+    width: 100%;
 }
 
-.day{
+.item-container a {
+    text-decoration: none;
+    display: block;
+    width: 100%;
+}
+
+/**************** PAGE EVENTLIST ****************/
+
+/* .day */
+.date {
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -217,11 +221,11 @@ body {
     border-radius: 20px;  
 }
 
-.events a {
+.event a {
     text-decoration: none;
 }
 
-.event-card{
+.event-medium-card{
     display: flex;
     flex-direction: row;
     margin: 5px;
@@ -242,18 +246,14 @@ body {
     object-fit: cover;
 }
 
-.event-info{
+.event-medium-card-data{
     display: flex;
     flex-direction: column;
     margin-left: 20px;
     color: black;
 }
-.event-time-location{}
-.event-name{}
-.event-organizer{}
-.event-moreinfo{}
 
-/**************** EVENTLIST FILTERS ****************/
+/**************** FILTERS ****************/
 /* Masquer toutes les listes par défaut */
 .filter-options {
   display: none;
@@ -319,15 +319,6 @@ body {
     padding-left: 10px;
 }
 
-.description-card-time-location{}
-.description-card-name{}
-.description-card-organizer{}
-.description-card-description{
-
-}
-.description-card-comment{}
-.description-card-moreinfo{}
-
 .limited-textarea {
     width: 100%;
     resize: none;         /* Empêche le redimensionnement */
@@ -368,74 +359,46 @@ body {
   white-space: normal;
 }
 
-
-
 /**************** PAGE ORGANISATION ****************/
 
-.orga-main-container {
-    display: flex;
-    flex-direction: row;
-}
-
-.orga-container {
-    width: 25vw;
-    display: flex;
-    flex-direction: row;
-    margin: 5px;
-    padding: 30px;
-    background-color: rgb(245, 242, 238);;
-    border-radius: 20px;  
-}
-
-.orga-description-card-btn {
+.left-container-btn {
     display: flex;
     flex-direction: row;
     gap: 20px;
     margin-top: 40px;
 }
 
-.orga-events-container {
-    display: flex;
-    flex-direction: column;
-}
-
-.orga-event-container {
-    width: 75vw;
+.event-small-card,
+.orga-small-card {
     display: flex;
     flex-direction: row;
-}
-
-.orga-event-card {
-    display: flex;
-    flex-direction: row;
-    width: 80%;
-    margin: 5px;
+    width: 100%;
+    /* margin: 5px; */
     padding: 10px;
     background-color: rgb(245, 242, 238);
     border-radius: 20px;
 }
 
-.orga-event-info {
+.event-small-card-data,
+.orga-small-card-data  {
     display: flex;
     flex-direction: column;
     margin-left: 10px;
-     /* background-color: blueviolet; */
+    color: black;
 }
 
-.orga-event-btn {
+.btn-container {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    width: 20%;
-    margin: 5px;
+    width: auto;
+    margin: 0px 5px 0px 5px;
     padding: 20px;
     background-color: rgb(245, 242, 238);
     border-radius: 20px;
 }
 
-
-
-/****************************************/
+/****************** RESPONSIVE *********************/
 @media (max-width: 992px) {
     header .header-container {
         grid-template-columns: 1fr auto;
