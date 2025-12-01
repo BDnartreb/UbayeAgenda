@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
+use function PHPUnit\Framework\throwException;
+
 final class EventController extends AbstractController
 {
 
@@ -40,6 +42,10 @@ final class EventController extends AbstractController
     {
         $event = new Event();
         $organisation = $this->getUser();
+        if($organisation){
+            throw $this->createNotFoundException('Admin introuvable!');
+        }
+
         $event->setOrganisation($organisation);
 
         // Récupérer les données sauvegardées en session si elles existent
@@ -267,7 +273,7 @@ final class EventController extends AbstractController
     #[Route('/admin/events', name: 'admin_events')]
     public function adminEvents(Request $request): Response
     {
-        /** @var Organisation $organisation */
+        /** @var Organisation $connectedUser */
         $connectedUser = $this->getUser();
         $admin = $this->em->getRepository(Organisation::class)->findOneBy(['email' => 'admin@ubayeagenda.com']);
 
@@ -279,7 +285,6 @@ final class EventController extends AbstractController
                 $organisationId = $this->em->getRepository(Organisation::class)->findOneBy(['name' => $orgaName])->getId();
                 $selectedOrganisationsId[] = $organisationId;
             }
-
 
             $selectedDate = $request->query->get('selectedDate');
             if(!$selectedDate){

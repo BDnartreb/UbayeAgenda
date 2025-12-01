@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class AppFixtures extends Fixture implements FixtureGroupInterface
 {
     private UserPasswordHasherInterface $userPasswordHasher;
-    private $params;
+    private ParameterBagInterface $params;
    
     public function __construct(
         UserPasswordHasherInterface $userPasswordHasher,

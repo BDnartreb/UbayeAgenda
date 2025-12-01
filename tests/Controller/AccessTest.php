@@ -73,7 +73,7 @@ final class AccessTest extends AbstractControllerTest
     /**
      * @dataProvider provideAuthorizedAccessToEventPages
      */
-    public function testAuthorizedAccesToEventPagesIsSuccessful(string $email, $path, $codeHttp): void
+    public function testAuthorizedAccesToEventPagesIsSuccessful(string $email, string $path, string $codeHttp): void
     {
         $event = $this->em->getRepository(Event::class)->findOneBy(['name' => 'EventTestName1']);
         $eventId = $event->getId();
@@ -108,7 +108,7 @@ final class AccessTest extends AbstractControllerTest
         /**
      * @dataProvider provideNotAuthorizedAccessToEventPages
      */
-    public function testNotauthorizedAccessToEventPagesFailed(string $email, $path, $codeHttp): void
+    public function testNotauthorizedAccessToEventPagesFailed(string $email, string $path, string $codeHttp): void
     {
         $event = $this->em->getRepository(Event::class)->findOneBy(['name' => 'EventTestName1']);
         $eventId = $event->getId();

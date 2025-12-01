@@ -21,6 +21,9 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
+    /**
+     * @return Event[]
+     */
     public function findAllOrderedByStartDateFromToday(): array
     {
         $today = new \DateTime('today');
@@ -33,7 +36,9 @@ class EventRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    
+    /**
+     * @return Event[]
+     */
     public function findEventsByOrganisationOrderedByStartDateFromToday(int $id): array
     {
         $today = new \DateTime('today');
@@ -48,10 +53,14 @@ class EventRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-      public function findEventsOrderedByStartDateFromSelectedDate(
-        array $organisations = [],
-        string $date
-         ): array
+    /**
+     * @param int[] $organisations
+     * @return Event[]
+     */
+    public function findEventsOrderedByStartDateFromSelectedDate(
+        string $date,
+        array $organisations = []        
+        ): array
         {
             $qb = $this->createQueryBuilder('e');
 
@@ -70,15 +79,24 @@ class EventRepository extends ServiceEntityRepository
                 ->getResult();
         }
 
+    /**
+     * @param int[] $organisations
+     * @param string[] $thematics
+     * @param string[] $fees
+     * @param string[] $publics
+     * @param TownEnum[] $towns
+     * @param int[] $locations IDs des locations
+     * @return Event[]
+     */
     public function findEventsByFiltersOrderedByStartDate(
+        string $date,
         array $organisations = [],
         array $thematics = [],
         array $fees = [],
         array $publics = [],
         array $towns = [],
         array $locations = [],
-        string $date,
-         ): array
+        ): array
         {
             $qb = $this->createQueryBuilder('e')
                 ->leftJoin('e.location', 'l') 
@@ -90,19 +108,19 @@ class EventRepository extends ServiceEntityRepository
             }
 
             if (!empty($thematics)) {
-                $thematicEnums = array_map(fn($t) => ThematicEnum::from($t), $thematics);
+                $thematicEnums = array_map(fn(string $t) => ThematicEnum::from($t), $thematics);
                 $qb->andWhere('e.thematic IN (:thematics)')
                     ->setParameter('thematics', $thematicEnums);
             }
 
             if (!empty($fees)) {
-                $feeEnums = array_map(fn($f) => FeeEnum::from($f), $fees);
+                $feeEnums = array_map(fn(string $f) => FeeEnum::from($f), $fees);
                 $qb->andWhere('e.fee IN (:fees)')
                     ->setParameter('fees', $feeEnums);
             }
 
             if (!empty($publics)) {
-                $publicEnums = array_map(fn($p) => PublicEnum::from($p), $publics);
+                $publicEnums = array_map(fn(string $p) => PublicEnum::from($p), $publics);
                 $qb->andWhere('e.public IN (:publics)')
                     ->setParameter('publics', $publicEnums);
             }

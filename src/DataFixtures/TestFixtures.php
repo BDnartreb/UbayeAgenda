@@ -19,8 +19,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class TestFixtures extends Fixture implements FixtureGroupInterface
 {
-    private $userPasswordHasher;
-    private $params;
+    private UserPasswordHasherInterface $userPasswordHasher;
+    private ParameterBagInterface $params;
    
     public function __construct(
         UserPasswordHasherInterface $userPasswordHasher,

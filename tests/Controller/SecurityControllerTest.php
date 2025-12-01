@@ -4,6 +4,9 @@ namespace App\Tests\Controller;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+
+
 
 final class SecurityControllerTest extends AbstractControllerTest
 {

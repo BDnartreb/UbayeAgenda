@@ -13,6 +13,9 @@ use App\Enum\StatusEnum;
 use App\Enum\TownEnum;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<Organisation>
+ */
 class RegisterType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

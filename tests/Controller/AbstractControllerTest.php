@@ -3,7 +3,7 @@
 namespace App\Tests\Controller;
 
 use App\Entity\Organisation;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -13,9 +13,11 @@ use Symfony\Component\DomCrawler\Crawler;
 abstract class AbstractControllerTest extends WebTestCase
 {
     protected KernelBrowser $client;
-    protected EntityManagerInterface $em;
+    /** @var EntityManager */
+    protected EntityManager $em;
     protected ParameterBagInterface $params;
     protected ?ContainerInterface $container = null;
+    /** @var object[] */
     private array $entitiesToRemove = [];
 
     protected function setUp(): void
@@ -26,9 +28,11 @@ abstract class AbstractControllerTest extends WebTestCase
         // $this->container = static::getContainer();
         // $this->em = $this->client->getContainer()->get(EntityManagerInterface::class);
 
-                $this->client = static::createClient();
+        $this->client = static::createClient();
         $this->container = $this->client->getContainer();
-        $this->em = $this->container->get('doctrine')->getManager();
+        /** @var EntityManager $entityManager */
+        $entityManager= $this->container->get('doctrine')->getManager();
+        $this->em = $entityManager;
 
         $this->client->catchExceptions(false);
 
@@ -38,10 +42,10 @@ abstract class AbstractControllerTest extends WebTestCase
     /**
      * Méthode utilitaire pour récupérer un utilisateur existant
      */
-    protected function getOrganisation(string $email)
+    protected function getOrganisation(string $email): ?Organisation
     {
         $container = static::getContainer();
-        $userRepo = $container->get('doctrine')->getRepository(\App\Entity\Organisation::class);
+        $userRepo = $container->get('doctrine')->getRepository(Organisation::class);
 
         return $userRepo->findOneBy(['email' => $email]);
     }
@@ -52,7 +56,9 @@ abstract class AbstractControllerTest extends WebTestCase
     protected function loginOrganisationByEmail(string $email): void
     {
         $organisation = $this->getOrganisation($email);
-        $this->client->loginUser($organisation);
+        if ($organisation){
+            $this->client->loginUser($organisation);
+        }
     }
 
     /**

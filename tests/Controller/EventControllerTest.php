@@ -69,7 +69,11 @@ final class EventControllerTest extends AbstractControllerTest
 
     /**
      * @dataProvider provideInvalidEventData
-     */
+     * 
+     *
+     * @param array<string, mixed> $formData Form fields to submit
+     * @param string $expectedErrorMessage
+    */
     public function testAddEventWithInvalidDataFailed(array $formData, string $expectedErrorMessage):void
         {
         $email = 'orgatest@email.com';
@@ -129,7 +133,7 @@ final class EventControllerTest extends AbstractControllerTest
     {
         $email = 'orgatest@email.com';
         $organisation = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $email]);
-        $event = $this->em->getRepository(Event::class)->findByOne(['organisation' => $organisation]);
+        $event = $this->em->getRepository(Event::class)->findOneBy(['organisation' => $organisation]);
         $eventId = $event->getId();
         $this->client->loginUser($organisation);
 

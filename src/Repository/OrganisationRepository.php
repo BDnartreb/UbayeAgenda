@@ -33,6 +33,10 @@ class OrganisationRepository extends ServiceEntityRepository implements Password
         $this->getEntityManager()->flush();
     }
 
+    /**
+     * @param string $role
+     * @return Organisation[]
+     */
     public function findByRole(string $role): array
     {
         $conn = $this->getEntityManager()->getConnection();

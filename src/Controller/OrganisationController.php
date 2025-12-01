@@ -61,7 +61,7 @@ final class OrganisationController extends AbstractController
     #[Route('/organisation/update', name: 'organisation_update', methods: ['GET', 'POST'])]
     public function update(Request $request): Response
     {
-        /** @var Organisation $organisation */
+        /** @var Organisation|null $organisation */
         $organisation = $this->getUser();
 
         if (!$organisation){
@@ -93,7 +93,7 @@ final class OrganisationController extends AbstractController
         TokenStorageInterface $tokenStorage
         ): Response
     {
-        /** @var Organisation $organisation */
+        /** @var Organisation|null $organisation */
         $organisation = $this->getUser();
 
         if (!$organisation){
@@ -158,7 +158,7 @@ final class OrganisationController extends AbstractController
     #[Route('/admin/organisation/delete/{id}', name: 'admin_organisation_delete', methods: ['GET', 'POST'])]
     public function admin_delete(int $id): Response
     {
-        /** @var Organisation $organisation */
+        /** @var Organisation|null $admin */
         $admin = $this->getUser();
 
         if (!$admin){
@@ -178,7 +178,7 @@ final class OrganisationController extends AbstractController
     #[Route('/organisation', name: 'organisation')]
     public function organisation(): Response
     {
-        /** @var \App\Entity\Organisation $organisation */
+        /** @var \App\Entity\Organisation|null $organisation */
         $organisation = $this->getUser();
         $organisationId = $organisation->getId();
         $events = $this->em->getRepository(Event::class)->findEventsByOrganisationOrderedByStartDateFromToday($organisationId);
@@ -195,7 +195,7 @@ final class OrganisationController extends AbstractController
     #[Route('/admin/organisations', name: 'admin_organisations')]
     public function organisations(): Response
     {
-        /** @var Organisation $organisation */
+        /** @var Organisation|null $connectedUser */
         $connectedUser = $this->getUser();
         $admin = $this->em->getRepository(Organisation::class)->findOneBy(['email' => 'admin@ubayeagenda.com']);
 

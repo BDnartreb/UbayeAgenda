@@ -55,6 +55,9 @@ final class OrganisationControllerTest extends AbstractControllerTest
     /**
      * Test of NotBlank and Uniq_Email
      * @dataProvider provideInvalidRegisterData
+     * 
+     * @param array<string, mixed> $formData Données invalides à injecter dans le formulaire
+     * @param string $expectedErrorMessage Message d'erreur attendu
      */
     public function testRegisterWithInvalidDataFailed(array $formData, string $expectedErrorMessage):void
     {
