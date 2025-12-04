@@ -209,6 +209,28 @@ final class OrganisationController extends AbstractController
 
         return $this->redirectToRoute('home');
     }
+
+    #[Route('/organisation/calendar', name: 'organisation_calendar')]
+    public function agenda(): Response
+    {
+        $events = $this->em->getRepository(Event::class)->findAll();
+        
+        $eventsArray = [];
+
+        foreach ($events as $event) {
+            $eventsArray[] = [
+                'title' => $event->getName(),
+                'start' => $event->getStartDate()->format('Y-m-d\TH:i:s'),
+                'end'   => $event->getEndDate() ? $event->getEndDate()->format('Y-m-d\TH:i:s') : null,
+                'color' => '#3788d8', // optionnel
+            ];
+        }
+
+
+        return $this->render('/organisation/calendar.html.twig', [
+            'events' => $eventsArray
+        ]);
+    }
 }
 
 

@@ -21,11 +21,13 @@
                                     <a href="{{ path('login') }}" class="nav-link {{ current == 'login' ? 'active' : '' }}">Connexion</a>
                                 {% endif %}
                                 {% if is_granted('ROLE_ORGANISATION') %}
+                                    <a href="{{ path('organisation_calendar') }}" class="nav-link {{ current == 'organisation_calendar' ? 'active' : '' }}">Calendrier</a>
                                     <a href="{{ path('organisation') }}" class="nav-link {{ current == 'organisation' ? 'active' : '' }}">Organisation</a>
                                     <a href="{{ path('organisation_event_add') }}" class="nav-link {{ current == 'organisation_event_add' ? 'active' : '' }}">Créer un événement</a>
                                     <a href="{{ path('logout') }}" class="nav-link">Déconnexion</a>
                                 {% endif %}
                                 {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('organisation_calendar') }}" class="nav-link {{ current == 'organisation_calendar' ? 'active' : '' }}">Calendrier</a>
                                     <a href="{{ path('admin_organisations') }}" class="nav-link {{ current == 'admin_organisations' ? 'active' : '' }}">Organisations</a>
                                     <a href="{{ path('admin_events') }}" class="nav-link {{ current == 'admin_events' ? 'active' : '' }}">Evénements</a>
                                     <a href="{{ path('logout') }}" class="nav-link">Déconnexion</a>

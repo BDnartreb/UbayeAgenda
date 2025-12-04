@@ -1,0 +1,58 @@
+{% extends 'front.html.twig' %}
+
+{% block title %}UbayeAgenda{% endblock %}
+
+{% block content %}
+    <div class="main-container">
+        <div class="central-container">
+        <div id='calendar'>
+
+        </div>
+        </div> 
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+  <script src="{{ asset('js/filters.js') }}" defer></script>
+
+  <script>
+    function initCalendar() {
+      const calendarEl = document.getElementById('calendar');
+      if (!calendarEl) return; // sécurité
+     
+      const eventsData = JSON.parse(`{{ events|json_encode|raw }}`);
+     
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'fr',
+
+        firstDay: 1,
+
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth timeGridWeek'
+        },
+
+        events: eventsData,
+
+        buttonText: {
+          today: 'Aujourd\'hui',
+          dayGridMonth: 'Mois',
+          dayGridWeek: 'Semaine',
+        },
+
+        nowIndicator: true,
+        
+      });
+      
+      calendar.render();
+    }
+
+    initCalendar();
+
+  </script>
+{% endblock %}
+
+
+

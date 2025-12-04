@@ -42,7 +42,7 @@ final class EventController extends AbstractController
     {
         $event = new Event();
         $organisation = $this->getUser();
-        if($organisation){
+        if(!$organisation){
             throw $this->createNotFoundException('Admin introuvable!');
         }
 
