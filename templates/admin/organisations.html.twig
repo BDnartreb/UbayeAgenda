@@ -24,7 +24,10 @@
 
                     <div class="btn-container">
                         <div>
-                            <form method="post" action="{{ path('admin_organisation_delete', {'id': organisation.id}) }}" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer cet organisation ?');">
+                            <a href="{{ path('organisation_update', {'id': organisation.id}) }}" class="btn-link btn-link-modify">Modifier</a>
+                        </div>
+                        <div>
+                            <form method="post" action="{{ path('organisation_delete', {'id': organisation.id}) }}" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer cet organisation ?');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ organisation.id) }}">
                                 <button type="submit" class="btn-link btn-link-delete">Supprimer</button>
                             </form>

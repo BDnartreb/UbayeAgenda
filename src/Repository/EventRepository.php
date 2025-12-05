@@ -21,20 +21,24 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
-    /**
-     * @return Event[]
-     */
-    public function findAllOrderedByStartDateFromToday(): array
-    {
-        $today = new \DateTime('today');
+    // /**
+    //  * @return Event[]
+    //  */
+    // public function findAllOrderedByStartDateFromToday(): array
+    // {
+    //     $today = new \DateTime('today');
+    //     $limitDate = (clone $today)->add(new \DateInterval('P15D'));
+        
 
-        return $this->createQueryBuilder('e')
-            ->where('e.startDate >= :today')
-            ->setParameter('today', $today)
-            ->orderBy('e.startDate', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
+    //     return $this->createQueryBuilder('e')
+    //         ->where('e.startDate >= :today')
+    //         ->andWhere('e.startDate <= :limitDate')
+    //         ->setParameter('today', $today)
+    //         ->setParameter('limitDate', $limitDate)
+    //         ->orderBy('e.startDate', 'ASC')
+    //         ->getQuery()
+    //         ->getResult();
+    // }
 
     /**
      * @return Event[]
@@ -69,9 +73,14 @@ class EventRepository extends ServiceEntityRepository
                     ->setParameter('organisations', $organisations);
             }
 
+            $selectedDate = new \DateTime($date);
+            $limitDate = (clone $selectedDate)->add(new \DateInterval('P15D'));
+
             if (!empty($date)) {
                 $qb->andWhere('e.startDate >= :date')
-                    ->setParameter('date', new \DateTime($date));
+                    ->andWhere('e.startDate <= :limitDate')
+                    ->setParameter('date', $selectedDate)
+                    ->setParameter('limitDate', $limitDate);
             }
 
             return $qb->orderBy('e.startDate', 'ASC')
@@ -88,8 +97,9 @@ class EventRepository extends ServiceEntityRepository
      * @param int[] $locations IDs des locations
      * @return Event[]
      */
-    public function findEventsByFiltersOrderedByStartDate(
+    public function findEventsOrderedByStartDate(
         string $date,
+        int $period,
         array $organisations = [],
         array $thematics = [],
         array $fees = [],
@@ -134,10 +144,18 @@ class EventRepository extends ServiceEntityRepository
                 $qb->andWhere('e.location IN (:locations)')
                     ->setParameter('locations', $locations);
             }
-
+            
             if (!empty($date)) {
+            $selectedDate = new \DateTime($date);
+            if (!empty($period)){
+                $limitDate = (clone $selectedDate)->add(new \DateInterval('P15D'));
+            } else {
+                $limitDate = (clone $selectedDate)->add(new \DateInterval('P' . $period . 'D'));
+            }
                 $qb->andWhere('e.startDate >= :date')
-                    ->setParameter('date', new \DateTime($date));
+                    ->andWhere('e.startDate <= :limitDate')
+                    ->setParameter('date', $selectedDate)
+                    ->setParameter('limitDate', $limitDate);
             }
 
             return $qb->orderBy('e.startDate', 'ASC')

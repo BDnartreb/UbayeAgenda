@@ -8,26 +8,51 @@
     <div class="left-container">
         <div class="">
             <h1>{{ organisation.name }}</h1>
-            <p>{{ organisation.address }}</p>
-            <p>{{ organisation.town.value }}</p>
+            <p>{{ organisation.address }}, {{ organisation.town.value }}</p>
             <p>{{ organisation.email }}</p>
             <p>{{ organisation.phone }}</p>
             <p>{{ organisation.status.value }}</p>
-            <h2>Référent :</h2>
-            <p>{{ organisation.firstName }}</h3>
-            <p></p>{{ organisation.lastName }}</h3>
+            <h3>Référent :</h3>
+            <p>{{ organisation.firstName }} {{ organisation.lastName }}</p>
         </div>
         <div class="left-container-btn">
             <div>
-                <a href="{{ path('organisation_update') }}" class="btn-link btn-link-modify">Modifier</a>
+                <a href="{{ path('organisation_update', {'id': organisation.id}) }}" class="btn-link btn-link-modify">Modifier</a>
             </div>
+            {% if is_granted('ROLE_ORGANISATION') and not is_granted('ROLE_ADMIN') %}
             <div>
-                <form method="post" action="{{ path('organisation_delete') }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le compte de votre organisation et les événements associés ?');">
+                <form method="post" action="{{ path('organisation_delete', {'id': organisation.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le compte de votre organisation et les événements associés ?');">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ organisation.id) }}">
                     <button class="btn-link btn-link-delete">Supprimer</button>
                 </form>
             </div>
+            {% endif %}
         </div>
+        <div><br><h3>Filtrer par :</h3></div>
+        <form id="filters-form" method="get" action="{{ path('organisation') }}">
+            {% set today = 'now'|date('Y-m-d') %}
+            <div class="filter-group">
+                <input 
+                    type="checkbox" 
+                    id="toggle-date" 
+                    hidden
+                    {% if selectedDate != today %}checked{% endif %}
+                >
+
+                <label for="toggle-date" class="filter-title">Date</label>
+
+                <div class="filter-options">
+                    <input 
+                        type="date"
+                        id="selectedDate"
+                        name="selectedDate"
+                        value="{{ selectedDate }}"
+                    >
+                </div>
+            </div>
+            <button type="submit" class="btn-link btn-link-modify">Filtrer</button>
+        </form>
+  
     </div>
     <div class="central-container">
         {% for event in events %}
@@ -39,14 +64,14 @@
                         </div>
                         <div class="event-small-card-data">
                             <div class=""><h2> {{ event.name }} </h2></div>
-                            <div class=""><h4>{{ event.startDate|date('l d/m/Y - H:i')  }} à {{ event.endDate|date('H:i')  }}</h4></div>
+                            <div class=""><h4>{{ event.startDate|date('l d/m/Y - H:i')  }} à {{ event.endDate|date('H:i') }}</h4></div>
                             <div class=""><h4>{{ event.location.name }} - {{ event.location.town.value }}</h4></div>
                         </div>
                     </div>
                 </a>
                 
                 <div class="btn-container">
-                        <div>
+                    <div>
                         <a href="{{ path('organisation_event_update', {'id': event.id}) }}" class="btn-link btn-link-modify">Modifier</a>
                     </div>
                     <div>

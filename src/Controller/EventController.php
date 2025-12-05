@@ -292,11 +292,19 @@ final class EventController extends AbstractController
                 $selectedDate = $today->format('Y-m-d');
             }
 
+            // $events = $this->em->getRepository(Event::class)
+            // ->findEventsOrderedByStartDateFromSelectedDate(
+            //     organisations: $selectedOrganisationsId,
+            //     date: $selectedDate
+            // );
+
             $events = $this->em->getRepository(Event::class)
-            ->findEventsOrderedByStartDateFromSelectedDate(
+            ->findEventsOrderedByStartDate(
                 organisations: $selectedOrganisationsId,
                 date: $selectedDate
             );
+
+            
        
             return $this->render('admin/events.html.twig', [
                 'events' => $events,

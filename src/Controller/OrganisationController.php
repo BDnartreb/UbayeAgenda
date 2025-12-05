@@ -58,14 +58,26 @@ final class OrganisationController extends AbstractController
         ]);
     }
 
-    #[Route('/organisation/update', name: 'organisation_update', methods: ['GET', 'POST'])]
-    public function update(Request $request): Response
+    #[Route('/organisation/update/{id?}', name: 'organisation_update', methods: ['GET', 'POST'])]
+    public function update(Request $request, ?int $id): Response
     {
-        /** @var Organisation|null $organisation */
-        $organisation = $this->getUser();
+        /** @var Organisation|null $currentUser */
+        $currentUser = $this->getUser();
 
-        if (!$organisation){
+        if (!$currentUser){
             throw $this->createNotFoundException('Organisation introuvable!');
+        }
+
+        if (in_array('ROLE_ADMIN', $currentUser->getRoles(), true) && $id !== null) {
+            if (!$id){
+                throw $this->createNotFoundException('id manquant!');
+            }
+            $organisation = $this->em->getRepository(Organisation::class)->find($id);
+            if (!$organisation){
+                throw $this->createNotFoundException('Organisation introuvable avec cet id!');
+            }
+        } else {
+            $organisation = $currentUser;
         }
 
         $form = $this->createForm(RegisterType::class, $organisation)->handleRequest($request);
@@ -87,18 +99,34 @@ final class OrganisationController extends AbstractController
         ]);
     }
 
-    #[Route('/organisation/delete', name: 'organisation_delete', methods: ['POST'])]
+    #[Route('/organisation/delete/{id?}', name: 'organisation_delete', methods: ['POST'])]
     public function delete(
+        ?int $id,
         Request $request,
         TokenStorageInterface $tokenStorage
         ): Response
     {
-        /** @var Organisation|null $organisation */
-        $organisation = $this->getUser();
+        /** @var Organisation|null $currentUser */
+        $currentUser = $this->getUser(); 
 
-        if (!$organisation){
-            throw $this->createNotFoundException('Organisation introuvable!');
+        if (!$currentUser){
+            throw $this->createNotFoundException('Il n\'y a pas d\'utilisateur connecté!');
         }
+
+        if (in_array('ROLE_ADMIN', $currentUser->getRoles(), true) && $id !== null) {
+            if (!$id){
+                throw $this->createNotFoundException('id manquant!');
+            }
+            $organisation = $this->em->getRepository(Organisation::class)->find($id);
+            if (!$organisation){
+                throw $this->createNotFoundException('Organisation introuvable avec cet id!');
+            }
+            if (in_array('ROLE_ADMIN', $organisation->getRoles(), true)){
+                throw $this->createNotFoundException('Il n\'est pas permis de supprimer le compte Administrateur!');
+            }
+        } else {
+            $organisation = $currentUser;
+        }   
 
         // Check CSRF token
         if (!$this->isCsrfTokenValid('delete'.$organisation->getId(), $request->request->get('_token'))) {
@@ -106,11 +134,8 @@ final class OrganisationController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        $currentUser = $tokenStorage->getToken()?->getUser();
-        $isCurrentUser = ($currentUser === $organisation);
-
         // Logout user if connected
-        if ($isCurrentUser) {
+        if ($currentUser === $organisation) {
             $tokenStorage->setToken(null);
             $request->getSession()->invalidate();
         }
@@ -122,6 +147,85 @@ final class OrganisationController extends AbstractController
         
         return $this->redirectToRoute('home');
     }
+
+    /**
+     * show organisation page
+     */
+    #[Route('/organisation', name: 'organisation')]
+    public function organisation(Request $request): Response
+    {
+        /** @var \App\Entity\Organisation|null $organisation */
+        $organisation = $this->getUser();
+        $organisationId[] = $organisation->getId();
+        $selectedDate = $request->query->get('selectedDate');
+        //dd($selectedDate);
+        if(!$selectedDate){
+            $today = new \DateTime('today');
+            $selectedDate = $today->format('Y-m-d');
+        }
+        //$events = $this->em->getRepository(Event::class)->findEventsByOrganisationOrderedByStartDateFromToday($organisationId);
+        $events = $this->em->getRepository(Event::class)
+            ->findEventsOrderedByStartDate(
+                date: $selectedDate,
+                organisations: $organisationId
+            );
+        return $this->render('organisation/organisation.html.twig', [
+            'organisation' => $organisation,
+            'selectedDate' => $selectedDate,
+            'events' => $events,
+        ]);
+    }
+
+    /**
+     * show list of organisations
+     */
+    #[Route('/admin/organisations', name: 'admin_organisations')]
+    public function organisations(): Response
+    {
+        /** @var Organisation|null $currentUser */
+        $currentUser = $this->getUser();
+        $admin = $this->em->getRepository(Organisation::class)->findOneBy(['email' => 'admin@ubayeagenda.com']);
+
+        if ($currentUser === $admin){
+            $organisations = $this->em->getRepository(Organisation::class)->findByRole('ROLE_ORGANISATION');
+
+            return $this->render('admin/organisations.html.twig', [
+                'organisations' => $organisations,
+            ]);
+        }
+
+        return $this->redirectToRoute('home');
+    }
+
+    #[Route('/organisation/calendar', name: 'organisation_calendar')]
+    public function agenda(): Response
+    {
+        // $events = $this->em->getRepository(Event::class)->findAll();
+        $period = 365;
+        $events = $this->em->getRepository(Event::class)->findEventsOrderedByStartDate(date: 'today', period: $period);
+        
+        $eventsArray = [];
+
+        foreach ($events as $event) {
+            $eventsArray[] = [
+                'title' => $event->getName(),
+                'start' => $event->getStartDate()->format('Y-m-d\TH:i:s'),
+                'end'   => $event->getEndDate() ? $event->getEndDate()->format('Y-m-d\TH:i:s') : null,
+                'color' => '#3788d8', // optionnel
+                // specific field
+                'extendedProps' => [
+                    'organisation' => $event->getOrganisation()->getName(),
+                    'location' => $event->getLocation()->getName(),
+                    'town' => $event->getLocation()->getTown(),
+                ],
+            ];
+        }
+
+        return $this->render('/organisation/calendar.html.twig', [
+            'events' => $eventsArray
+        ]);
+    }
+}
 
     // #[Route('/admin/organisation/update/{id}', name: 'admin_organisation_update', methods: ['GET', 'POST'])]
     // public function admin_update(Request $request, int $id): Response
@@ -155,112 +259,21 @@ final class OrganisationController extends AbstractController
     // }
 
 
-    #[Route('/admin/organisation/delete/{id}', name: 'admin_organisation_delete', methods: ['GET', 'POST'])]
-    public function admin_delete(int $id): Response
-    {
-        /** @var Organisation|null $admin */
-        $admin = $this->getUser();
+    // #[Route('/admin/organisation/delete/{id}', name: 'admin_organisation_delete', methods: ['GET', 'POST'])]
+    // public function admin_delete(int $id): Response
+    // {
+    //     /** @var Organisation|null $admin */
+    //     $admin = $this->getUser();
 
-        if (!$admin){
-            throw $this->createNotFoundException('Admin introuvable!');
-        }
+    //     if (!$admin){
+    //         throw $this->createNotFoundException('Admin introuvable!');
+    //     }
 
-        $organisation = $this->em->getRepository(Organisation::class)->find($id);
-        $this->em->remove($organisation);
-        $this->em->flush();
+    //     $organisation = $this->em->getRepository(Organisation::class)->find($id);
+    //     $this->em->remove($organisation);
+    //     $this->em->flush();
 
-        return $this->redirectToRoute('admin_organisations');
-    }
-
-    /**
-     * show organisation page
-     */
-    #[Route('/organisation', name: 'organisation')]
-    public function organisation(): Response
-    {
-        /** @var \App\Entity\Organisation|null $organisation */
-        $organisation = $this->getUser();
-        $organisationId = $organisation->getId();
-        $events = $this->em->getRepository(Event::class)->findEventsByOrganisationOrderedByStartDateFromToday($organisationId);
-
-        return $this->render('organisation/organisation.html.twig', [
-            'organisation' => $organisation,
-            'events' => $events,
-        ]);
-    }
-
-        /**
-     * show list of organisations
-     */
-    #[Route('/admin/organisations', name: 'admin_organisations')]
-    public function organisations(): Response
-    {
-        /** @var Organisation|null $connectedUser */
-        $connectedUser = $this->getUser();
-        $admin = $this->em->getRepository(Organisation::class)->findOneBy(['email' => 'admin@ubayeagenda.com']);
-
-        if ($connectedUser === $admin){
-            $organisations = $this->em->getRepository(Organisation::class)->findByRole('ROLE_ORGANISATION');
-
-            return $this->render('admin/organisations.html.twig', [
-                'organisations' => $organisations,
-            ]);
-        }
-
-        return $this->redirectToRoute('home');
-    }
-
-    #[Route('/organisation/calendar', name: 'organisation_calendar')]
-    public function agenda(): Response
-    {
-        $events = $this->em->getRepository(Event::class)->findAll();
-        
-        $eventsArray = [];
-
-        foreach ($events as $event) {
-            $eventsArray[] = [
-                'title' => $event->getName(),
-                'start' => $event->getStartDate()->format('Y-m-d\TH:i:s'),
-                'end'   => $event->getEndDate() ? $event->getEndDate()->format('Y-m-d\TH:i:s') : null,
-                'color' => '#3788d8', // optionnel
-            ];
-        }
+    //     return $this->redirectToRoute('admin_organisations');
+    // }
 
 
-        return $this->render('/organisation/calendar.html.twig', [
-            'events' => $eventsArray
-        ]);
-    }
-}
-
-
-// #[Route('/organisation/delete/{id}', name: 'admin_orga_delete', methods: ['POST'])]
-// public function delete(Request $request, Organisation $organisation, TokenStorageInterface $tokenStorage): Response
-// {
-//     // Vérifie le token CSRF
-//     if (!$this->isCsrfTokenValid('delete'.$organisation->getId(), $request->request->get('_token'))) {
-//         $this->addFlash('error', 'Token CSRF invalide.');
-//         return $this->redirectToRoute('admin_orga_list');
-//     }
-
-//     // Sécurité : autorisation via le voter
-//     $this->denyAccessUnlessGranted('EDIT', $organisation);
-
-//     $currentUser = $tokenStorage->getToken()?->getUser();
-//     $isCurrentUser = ($currentUser === $organisation);
-
-//     // Supprime l'organisation
-//     $this->em->remove($organisation);
-//     $this->em->flush();
-
-//     // Déconnexion si on supprime l'utilisateur connecté
-//     if ($isCurrentUser) {
-//         $tokenStorage->setToken(null);
-//         $request->getSession()->invalidate();
-//         $this->addFlash('success', 'Votre compte a été supprimé.');
-//         return $this->redirectToRoute('app_login');
-//     }
-
-//     $this->addFlash('success', 'Organisation supprimée avec succès.');
-//     return $this->redirectToRoute('admin_orga_list');
-// }

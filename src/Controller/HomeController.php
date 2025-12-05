@@ -79,7 +79,7 @@ final class HomeController extends AbstractController
             }
 
         //events selected
-        $events = $eventRepository->findEventsByFiltersOrderedByStartDate(
+        $events = $eventRepository->findEventsOrderedByStartDate(
             fees: $selectedFees,
             thematics: $selectedThematics,
             publics: $selectedPublics,
