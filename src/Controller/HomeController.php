@@ -52,6 +52,7 @@ final class HomeController extends AbstractController
         $publics = PublicEnum::cases();
         $towns = TownEnum::cases();
         $locations = $this->em->getrepository(Location::class)->findAll();
+        $period = 365;
 
         // Filters selected
         $selectedThematics = $request->query->all('thematics');
@@ -133,11 +134,17 @@ final class HomeController extends AbstractController
     }
 
     #[Route('/charter', name: 'charter')]
-    public function about(): Response
+    public function charter(): Response
     {
         return $this->render('home/charter.html.twig', [
             'controller_name' => 'HomeController',
         ]);
+    }
+
+    #[Route('/usermanual', name: 'usermanual')]
+    public function usermanual(): Response
+    {
+        return $this->render('home/usermanual.html.twig');
     }
 
     #[Route('/test-mail')]

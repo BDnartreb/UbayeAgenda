@@ -45,39 +45,30 @@
         nowIndicator: true,
 
         // display specific field (organisation)
-        // eventDidMount: function(info) {
-        //     const organisation = info.event.extendedProps.organisation;
-        //     const location = info.event.extendedProps.location;
-        //     if (organisation) {
-        //         info.el.setAttribute('title', `Organisation : ${organisation}`, `Lieu : ${location}`);
-        //     }
-        // }
         eventDidMount: function(info) {
-    const organisation = info.event.extendedProps.organisation;
-    const location = info.event.extendedProps.location;
-    const town = info.event.extendedProps.town;
-    // Crée le texte du tooltip
-    let tooltipText = '';
-    if (organisation) {
-        tooltipText += `${organisation}`;
-    }
-    if (location) {
-        if (tooltipText !== '') tooltipText += '\n'; // saut de ligne
-        tooltipText += `${location}`;
-    }
-    if (town) {
-        if (tooltipText !== '') tooltipText += '\n'; // saut de ligne
-        tooltipText += `${town}`;
-    }
+            const organisation = info.event.extendedProps.organisation;
+            const location = info.event.extendedProps.location;
+            const town = info.event.extendedProps.town;
+            // Crée le texte du tooltip
+            let tooltipText = '';
+            if (organisation) {
+                tooltipText += `${organisation}`;
+            }
+            if (location) {
+                if (tooltipText !== '') tooltipText += '\n'; // saut de ligne
+                tooltipText += `${location}`;
+            }
+            if (town) {
+                if (tooltipText !== '') tooltipText += '\n'; // saut de ligne
+                tooltipText += `${town}`;
+            }
 
-    // Ajoute le tooltip
-    if (tooltipText !== '') {
-        info.el.setAttribute('title', tooltipText);
-    }
-}
-        
+            // Ajoute le tooltip
+            if (tooltipText !== '') {
+                info.el.setAttribute('title', tooltipText);
+            }
+        }
       });
-      
       calendar.render();
     }
 

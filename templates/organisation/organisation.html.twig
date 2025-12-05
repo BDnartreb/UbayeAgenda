@@ -59,9 +59,11 @@
             <div class="item-container"> 
                 <a href="{{ path('event', {'id': event.id}) }}">
                     <div class="event-small-card">
-                        <div class="event-poster">
-                            <img src="{{ asset(event.poster) }}" alt="Affiche de l'événement">
-                        </div>
+                        {% if event.poster is not null %}
+                            <div class="event-poster">
+                                <img src="{{ asset(event.poster) }}" alt="Affiche de l'événement">
+                            </div>
+                        {% endif %}
                         <div class="event-small-card-data">
                             <div class=""><h2> {{ event.name }} </h2></div>
                             <div class=""><h4>{{ event.startDate|date('l d/m/Y - H:i')  }} à {{ event.endDate|date('H:i') }}</h4></div>

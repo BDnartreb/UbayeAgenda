@@ -156,7 +156,7 @@ final class OrganisationController extends AbstractController
     {
         /** @var \App\Entity\Organisation|null $organisation */
         $organisation = $this->getUser();
-        $organisationId[] = $organisation->getId();
+        $organisationId = $organisation->getId();
         $selectedDate = $request->query->get('selectedDate');
         //dd($selectedDate);
         if(!$selectedDate){
@@ -165,9 +165,9 @@ final class OrganisationController extends AbstractController
         }
         //$events = $this->em->getRepository(Event::class)->findEventsByOrganisationOrderedByStartDateFromToday($organisationId);
         $events = $this->em->getRepository(Event::class)
-            ->findEventsOrderedByStartDate(
+            ->findEventsByOrganisation(
                 date: $selectedDate,
-                organisations: $organisationId
+                organisationId: $organisationId
             );
         return $this->render('organisation/organisation.html.twig', [
             'organisation' => $organisation,
@@ -201,8 +201,7 @@ final class OrganisationController extends AbstractController
     public function agenda(): Response
     {
         // $events = $this->em->getRepository(Event::class)->findAll();
-        $period = 365;
-        $events = $this->em->getRepository(Event::class)->findEventsOrderedByStartDate(date: 'today', period: $period);
+        $events = $this->em->getRepository(Event::class)->findEventsForCalendar();
         
         $eventsArray = [];
 
@@ -212,6 +211,7 @@ final class OrganisationController extends AbstractController
                 'start' => $event->getStartDate()->format('Y-m-d\TH:i:s'),
                 'end'   => $event->getEndDate() ? $event->getEndDate()->format('Y-m-d\TH:i:s') : null,
                 'color' => '#3788d8', // optionnel
+                'url'   => $this->generateUrl('event', ['id' => $event->getId()]),
                 // specific field
                 'extendedProps' => [
                     'organisation' => $event->getOrganisation()->getName(),

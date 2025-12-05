@@ -21,6 +21,7 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
+
     // /**
     //  * @return Event[]
     //  */
@@ -43,52 +44,47 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[]
      */
-    public function findEventsByOrganisationOrderedByStartDateFromToday(int $id): array
+    public function findEventsForCalendar(): array
     {
         $today = new \DateTime('today');
+        $daysBefore = 30;
+        $daysAfter = 365;
+        $periodStart = (clone $today)->sub(new \DateInterval('P' . $daysBefore . 'D'));
+        $periodEnd = (clone $today)->add(new \DateInterval('P' . $daysAfter . 'D'));
 
         return $this->createQueryBuilder('e')
-            ->where('e.startDate >= :today')
-            ->andWhere('e.organisation = :id')
-            ->setParameter('today', $today)
-            ->setParameter('id', $id)
+            ->where('e.startDate >= :periodStart')
+            ->andWhere('e.startDate <= :periodEnd')
+            ->setParameter('periodStart', $periodStart)
+            ->setParameter('periodEnd', $periodEnd)
             ->orderBy('e.startDate', 'ASC')
             ->getQuery()
             ->getResult();
     }
 
-    /**
-     * @param int[] $organisations
+        /**
      * @return Event[]
      */
-    public function findEventsOrderedByStartDateFromSelectedDate(
-        string $date,
-        array $organisations = []        
+    public function findEventsByOrganisation(
+        string $date, 
+        string $organisationId
         ): array
-        {
-            $qb = $this->createQueryBuilder('e');
-
-            if (!empty($organisations)) {
-                $qb->andWhere('e.organisation IN (:organisations)')
-                    ->setParameter('organisations', $organisations);
-            }
-
+    {
+        if (!empty($date)) {
             $selectedDate = new \DateTime($date);
-            $limitDate = (clone $selectedDate)->add(new \DateInterval('P15D'));
-
-            if (!empty($date)) {
-                $qb->andWhere('e.startDate >= :date')
-                    ->andWhere('e.startDate <= :limitDate')
-                    ->setParameter('date', $selectedDate)
-                    ->setParameter('limitDate', $limitDate);
-            }
-
-            return $qb->orderBy('e.startDate', 'ASC')
-                ->getQuery()
-                ->getResult();
         }
+    
+        return $this->createQueryBuilder('e')
+            ->where('e.startDate >= :date')
+            ->andWhere('e.organisation = :organisationId')
+            ->setParameter('date', $selectedDate)
+            ->setParameter('organisationId', $organisationId)
+            ->orderBy('e.startDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
-    /**
+        /**
      * @param int[] $organisations
      * @param string[] $thematics
      * @param string[] $fees
@@ -99,7 +95,6 @@ class EventRepository extends ServiceEntityRepository
      */
     public function findEventsOrderedByStartDate(
         string $date,
-        int $period,
         array $organisations = [],
         array $thematics = [],
         array $fees = [],
@@ -107,61 +102,91 @@ class EventRepository extends ServiceEntityRepository
         array $towns = [],
         array $locations = [],
         ): array
-        {
-            $qb = $this->createQueryBuilder('e')
-                ->leftJoin('e.location', 'l') 
-                ->addSelect('l');;;
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->leftJoin('e.location', 'l') 
+            ->addSelect('l');;;
 
-            if (!empty($organisations)) {
-                $qb->andWhere('e.organisation IN (:organisations)')
-                    ->setParameter('organisations', $organisations);
-            }
-
-            if (!empty($thematics)) {
-                $thematicEnums = array_map(fn(string $t) => ThematicEnum::from($t), $thematics);
-                $qb->andWhere('e.thematic IN (:thematics)')
-                    ->setParameter('thematics', $thematicEnums);
-            }
-
-            if (!empty($fees)) {
-                $feeEnums = array_map(fn(string $f) => FeeEnum::from($f), $fees);
-                $qb->andWhere('e.fee IN (:fees)')
-                    ->setParameter('fees', $feeEnums);
-            }
-
-            if (!empty($publics)) {
-                $publicEnums = array_map(fn(string $p) => PublicEnum::from($p), $publics);
-                $qb->andWhere('e.public IN (:publics)')
-                    ->setParameter('publics', $publicEnums);
-            }
-
-            if (!empty($towns)) {
-                $qb->andWhere('l.town IN (:towns)')
-                    ->setParameter('towns', $towns);
-            }
-
-            if (!empty($locations)) {
-                $qb->andWhere('e.location IN (:locations)')
-                    ->setParameter('locations', $locations);
-            }
-            
-            if (!empty($date)) {
-            $selectedDate = new \DateTime($date);
-            if (!empty($period)){
-                $limitDate = (clone $selectedDate)->add(new \DateInterval('P15D'));
-            } else {
-                $limitDate = (clone $selectedDate)->add(new \DateInterval('P' . $period . 'D'));
-            }
-                $qb->andWhere('e.startDate >= :date')
-                    ->andWhere('e.startDate <= :limitDate')
-                    ->setParameter('date', $selectedDate)
-                    ->setParameter('limitDate', $limitDate);
-            }
-
-            return $qb->orderBy('e.startDate', 'ASC')
-                ->getQuery()
-                ->getResult();
+        if (!empty($organisations)) {
+            $qb->andWhere('e.organisation IN (:organisations)')
+                ->setParameter('organisations', $organisations);
         }
+
+        if (!empty($thematics)) {
+            $thematicEnums = array_map(fn(string $t) => ThematicEnum::from($t), $thematics);
+            $qb->andWhere('e.thematic IN (:thematics)')
+                ->setParameter('thematics', $thematicEnums);
+        }
+
+        if (!empty($fees)) {
+            $feeEnums = array_map(fn(string $f) => FeeEnum::from($f), $fees);
+            $qb->andWhere('e.fee IN (:fees)')
+                ->setParameter('fees', $feeEnums);
+        }
+
+        if (!empty($publics)) {
+            $publicEnums = array_map(fn(string $p) => PublicEnum::from($p), $publics);
+            $qb->andWhere('e.public IN (:publics)')
+                ->setParameter('publics', $publicEnums);
+        }
+
+        if (!empty($towns)) {
+            $qb->andWhere('l.town IN (:towns)')
+                ->setParameter('towns', $towns);
+        }
+
+        if (!empty($locations)) {
+            $qb->andWhere('e.location IN (:locations)')
+                ->setParameter('locations', $locations);
+        }
+        
+        if (!empty($date)) {
+            $selectedDate = new \DateTime($date);
+            $limitDate = (clone $selectedDate)->add(new \DateInterval('P15D'));
+
+            $qb->andWhere('e.startDate >= :date')
+                ->andWhere('e.startDate <= :limitDate')
+                ->setParameter('date', $selectedDate)
+                ->setParameter('limitDate', $limitDate);
+        }
+
+        return $qb->orderBy('e.startDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+    
+    // /**
+    //  * @param int[] $organisations
+    //  * @return Event[]
+    //  */
+    // public function findEventsOrderedByStartDateFromSelectedDate(
+    //     string $date,
+    //     array $organisations = []        
+    //     ): array
+    //     {
+    //         $qb = $this->createQueryBuilder('e');
+
+    //         if (!empty($organisations)) {
+    //             $qb->andWhere('e.organisation IN (:organisations)')
+    //                 ->setParameter('organisations', $organisations);
+    //         }
+
+    //         $selectedDate = new \DateTime($date);
+    //         $limitDate = (clone $selectedDate)->add(new \DateInterval('P15D'));
+
+    //         if (!empty($date)) {
+    //             $qb->andWhere('e.startDate >= :date')
+    //                 ->andWhere('e.startDate <= :limitDate')
+    //                 ->setParameter('date', $selectedDate)
+    //                 ->setParameter('limitDate', $limitDate);
+    //         }
+
+    //         return $qb->orderBy('e.startDate', 'ASC')
+    //             ->getQuery()
+    //             ->getResult();
+    //     }
+
+
 
 
     //    /**
