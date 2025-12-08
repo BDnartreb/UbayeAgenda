@@ -45,9 +45,9 @@ abstract class AbstractControllerTest extends WebTestCase
     protected function getOrganisation(string $email): ?Organisation
     {
         $container = static::getContainer();
-        $userRepo = $container->get('doctrine')->getRepository(Organisation::class);
+        $organisationRepository = $container->get('doctrine')->getRepository(Organisation::class);
 
-        return $userRepo->findOneBy(['email' => $email]);
+        return $organisationRepository->findOneBy(['email' => $email]);
     }
 
     /**

@@ -4,10 +4,16 @@ namespace App\Enum;
 
 enum ThematicEnum: string
 {
-    case EXPOSITION = 'Exposition';
-    case SPECTACLE = 'Spectacle';
-    case MUSIC = 'Musique';
+    case CULTURE = 'Art & Culture';
+    case CITIZEN = 'Citoyenneté';
+    case PARTY = 'Evénement festif';
     case SPORT = 'Sport';
-    case CONFERENCE = 'Conférence';
-    case THEATRE = 'Théâtre';
 }
+
+    // case EXPOSITION = 'Exposition';
+    // case SPECTACLE = 'Spectacle';
+    // case THEATRE = 'Théâtre';
+    // case DANCE = 'Danse';
+    // case SCIENCES = 'Sciences';
+    // case BOOKS = 'Livre & lecture';
+    // case WORKSHOP = 'Atelier';

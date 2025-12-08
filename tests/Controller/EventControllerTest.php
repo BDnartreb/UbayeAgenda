@@ -5,28 +5,71 @@ namespace App\Tests\Controller;
 use App\Entity\Event;
 use App\Entity\Location;
 use App\Entity\Organisation;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 final class EventControllerTest extends AbstractControllerTest
 {
-
-    public function testDisplayEventPageIsSuccessful():void
+    /**
+     * @dataProvider provideAccessToEventData
+     */
+    public function testAccessToEventIsSuccessful(?string $email): void
     {
-        $eventName = "EventTestName1";
-        $eventId = $this->em->getRepository(Event::class)->findOneBy(['name' => $eventName])->getId();
-        $this->client->request('GET','/event/event/' . $eventId);
-        $this->assertResponseIsSuccessful();
+        if ($email !== null){
+            $connectedUser = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $email]);
+            $this->client->loginUser($connectedUser);
+        }
 
-        $this->assertSelectorTextContains('h1', $eventName);
+        $event = $this->em->getRepository(Event::class)->findOneBy(['name' => 'EventTestName1']);
+        $eventId = $event->getId();
+
+        $this->client->request('GET', '/event/event/' . $eventId);
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->assertSelectorTextContains('h1', 'EventTestName1');
+    }
+    
+    public function provideAccessToEventData(): \Generator
+    {
+        yield 'user_visitor_to_event' => [null];
+        yield 'user_organisation_to_event' => ['orgatest@email.com'];
+        yield 'user_admin_to_event' => ['admin@ubayeagenda.com'];
     }
 
-// Given : a new organisation create an event
-// When : information given complies with the form (good organisation)
-// Then : check display of the page
-// And : check authentication
-// And : check new event has created in the database
-// And : check the redirection
+    /**
+     * @dataProvider providerEventAddForbiddenToVisitorData
+     */
+    public function testAccessToEventAddByVisitorFailed(string $path, string $method):void
+    {
+        $this->client->catchExceptions(true);
+        $this->client->request($method, $path);
+       // $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+        $this->assertResponseRedirects('/login', Response::HTTP_FOUND);
+    }
+
+    public function providerEventAddForbiddenToVisitorData(): \Generator
+    {
+        yield 'user_visitor_to_event_add' => ['/organisation/event/add', 'GET'];
+        yield 'user_visitor_to_location_add' => ['/organisation/location/add', 'GET'];
+        yield 'user_visitor_to_events' => ['/admin/events', 'GET']; 
+    }
+
+        /**
+     * @dataProvider providerEventUpdateAndDeleteForbiddenToVisitorData
+     */
+    public function testAccessEventUpdateAndDeleteByVisitorFailed(string $path, string $method):void
+    {
+        $eventId = $this->em->getRepository(Event::class)->findOneBy(['name' => 'EventTestName1'])->getId();
+        $this->client->catchExceptions(true);
+        $this->client->request($method, $path . $eventId);
+        $this->assertResponseRedirects('/login', Response::HTTP_FOUND);
+    }
+
+    public function providerEventUpdateAndDeleteForbiddenToVisitorData(): \Generator
+    {
+        yield 'user_visitor_to_location_update' => ['/organisation/location/update/', 'GET'];
+        yield 'user_visitor_to_event_update' => ['/organisation/event/update/', 'GET'];   
+        yield 'user_visitor_to_event_delete' => ['/organisation/event/delete/', 'POST']; 
+    }
+
     public function testAddEventIsSuccessful():void
     {
         $email = 'orgatest@email.com';
@@ -43,10 +86,10 @@ final class EventControllerTest extends AbstractControllerTest
                 
         $form = $crawler->filter('form[name="event"]')->form([
             'event[name]' => $eventName,
-            // 'event[startDate]' => (new \DateTime())->format('Y-m-d\TH:i'),
-            'event[startDate]' => $startDate,
+            'event[startDate]' => (new \DateTime())->format('Y-m-d\TH:i'),
+            // 'event[startDate]' => $startDate,
             'event[description]' => 'Blabla',
-            'event[poster]' => '',
+            //'event[poster]' => '',
             'event[fee]' => '2',
             'event[comment]' => '',
             'event[thematic]' => '3',
@@ -62,12 +105,7 @@ final class EventControllerTest extends AbstractControllerTest
         $this->assertSelectorTextContains('h1', $eventName);
     }
 
-// Given : an new organisation create an bad event
-// When : information given are not correct
-// Then : check that new event is not created in the database
-// And : check error message and redirection
-
-    /**
+/**
      * @dataProvider provideInvalidEventData
      * 
      *
@@ -92,7 +130,7 @@ final class EventControllerTest extends AbstractControllerTest
             // 'event[startDate]' => (new \DateTime())->format('Y-m-d\TH:i'),
             'event[startDate]' => (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d\TH:i'),
             'event[description]' => 'Blabla',
-            'event[poster]' => '',
+            //'event[poster]' => '',
             'event[fee]' => '2',
             'event[comment]' => '',
             'event[thematic]' => '3',
@@ -123,44 +161,71 @@ final class EventControllerTest extends AbstractControllerTest
         yield 'empty location' => [['event[location]' => ''], 'Ce champ doit être renseigné',];
     }
 
-// Given : a new organisation update an event
-// When : connecting
-// Then : check display of the page
-// And : check authentication
-// And : check new event has created in the database
-// And : check the redirection
-    public function testUpdateEventIsSuccessful():void
-    {
-        $email = 'orgatest@email.com';
-        $organisation = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $email]);
-        $event = $this->em->getRepository(Event::class)->findOneBy(['organisation' => $organisation]);
-        $eventId = $event->getId();
-        $this->client->loginUser($organisation);
 
-        $crawler = $this->client->request('GET', '/organisation/event/add');
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('form[name="event"]');
+    public function testAddLocationIsSuccessful():void
+    {
 
     }
 
-// Given : a registered organisation connects to the organisation delete page
-// When : connexion
-// Then : check display of the page
-// And : authentication for user : visitor, organisation, admin
-// And : check error message and the redirection
+    public function testAddLocationWithInvalidDataFailed():void
+    {
+
+    }
+
+    public function testUpdateLocationIsSuccessful():void
+    {
+
+    }
+
+    public function testUpdateLocationWithInvalidDataFailed():void
+    {
+
+    }
+
+
+    /**
+     * @dataProvider provideUpdateEventData
+     */
+    public function testUpdateEventIsSuccessful(string $email, string $path, string $method, string $codeHttp): void
+    {
+        if ($email !== null){
+            $connectedUser = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $email]);
+            $this->client->loginUser($connectedUser);
+        }
+
+        $event = $this->em->getRepository(Event::class)->findOneBy(['name' => 'EventTestName1']);
+        $eventId = $event->getId();
+
+        $crawler = $this->client->request($method, $path . $eventId);
+        $this->assertResponseStatusCodeSame(constant(Response::class . '::' . $codeHttp));
+        $this->assertSelectorTextContains('h1', 'EventTestName1');
+    }
+
+    public function provideUpdateEventData(): \Generator
+    {
+
+        yield 'user_organisation_to_event_update' => ['orgatest@email.com', 'GET', '/organisation/event/update/', 'HTTP_FOUND'];
+        yield 'user_admin_to_event_update' => ['admin@ubayeagenda.com', 'GET', '/organisation/event/update/', 'HTTP_FOUND'];    
+    }
+
+    /**
+     * @dataProvider provideDeleteEventData
+     */
     public function testDeleteEventIsSuccessful():void
     {
 
     }
 
-    // public function testAccessToAddEventPage():void
-    // public function testAccessToUpdateEventPage():void
-    // public function testAccessToDeleteEventPage():void
+    public function provideDeleteEventData(): \Generator
+    {   
+
+        yield 'user_organisation_to_event_delete' => ['orgatest@email.com', '/organisation/event/delete/', 'POST', 'HTTP_FOUND'];
+        yield 'user_admin_to_event_delete' => ['admin@ubayeagenda.com', '/organisation/event/delete/', 'POST', 'HTTP_FOUND'];
+
+    }
 
 
-
-
-    public function testDisplayOfEventListForAdminIsSuccessful():void
+    public function testEventsForAdminIsSuccessful():void
     {
         $adminEmail = "admin@ubayeagenda.com";
         $path = '/admin/events';
@@ -174,4 +239,5 @@ final class EventControllerTest extends AbstractControllerTest
         $numberExpected = count($events);
         $this->assertSelectorCount($numberExpected, '.event_name');
     }
+
 }

@@ -160,13 +160,14 @@ final class EventController extends AbstractController
             throw $this->createNotFoundException('Cet événement n\'existe pas.');
         }
         
+        $admin = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $_ENV['ADMIN_EMAIL']]);
         $organisation= $event->getOrganisation();
         $connectedUser = $this->getUser();
         
         $form = $this->createForm(EventType::class, $event)->handleRequest($request); 
 
-        if ($organisation !== $connectedUser){
-            throw $this->createAccessDeniedException();
+        if ($organisation !== $connectedUser && $connectedUser !== $admin){
+             throw $this->createAccessDeniedException();
         }
 
         if ($organisation === $connectedUser){
@@ -211,62 +212,6 @@ final class EventController extends AbstractController
 //          unlink($filePath); // supprime physiquement le fichier sur le disque
 //      }
 
-
-    #[Route('/admin/event/update/{id}', name: 'admin_event_update')]
-    public function admin_event_update(int $id, Request $request): Response
-    {
-        $event = $this->em->getRepository(Event::class)->find($id);
-        if(!$event){
-            throw $this->createNotFoundException('Cet événement n\'existe pas.');
-        }
-        
-        $form = $this->createForm(EventType::class, $event)->handleRequest($request); 
-
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $this->em->persist($event);
-            $this->em->flush();
-
-            $this->addFlash('success', 'Événement modifié avec succès !');
-
-            return $this->redirectToRoute('event', ['id' => $event->getId()]);
-        }
-
-        return $this->render('/organisation/eventForm.html.twig', ['form' => $form]);
-    }
-
-    #[Route('/admin/event/delete/{id}', name: 'admin_event_delete')]
-    public function admin_event_delete(int $id): Response
-    {
-        $event = $this->em->getRepository(Event::class)->find($id);
-        if(!$event){
-            throw $this->createNotFoundException('Cet événement n\'existe pas.');
-        }
-
-        $this->em->remove($event);
-        $this->em->flush();
-
-        $this->addFlash('success', 'Evénement supprimé avec succès !');
-
-        return $this->redirectToRoute('admin_events');
-    }
-
-    // /**
-    //  * Show list of events proposed by the organisation
-    //  */
-    // #[Route('/organisation/events', name: 'organisation_events')]
-    // public function userEvents(): Response
-    // {
-    //     /** @var Organisation $organisation */
-    //     $organisation = $this->getUser();
-    //     $events = $this->em->getRepository(Event::class)->findBy(['email' => $organisation->getEmail()]);
-
-    //     return $this->render('organisation/organisation.html.twig', [
-    //         'organisation' => $organisation,
-    //         'events' => $events,
-    //     ]);
-    // }
-
     /**
      * Show list of events for admin
      */
@@ -304,8 +249,6 @@ final class EventController extends AbstractController
                 date: $selectedDate
             );
 
-            
-       
             return $this->render('admin/events.html.twig', [
                 'events' => $events,
                 'organisations' => $organisations,
@@ -316,5 +259,4 @@ final class EventController extends AbstractController
 
         return $this->redirectToRoute('/');
     }
-
 }

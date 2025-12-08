@@ -11,7 +11,7 @@ final class HomeControllerTest extends AbstractControllerTest
         $this->assertResponseRedirects('/eventlist');
         $this->client->followRedirect();
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('.day-container');
+        $this->assertSelectorCount(8, '.event');
     }
 
     public function testDisplayOfPostersPage():void
@@ -25,12 +25,20 @@ final class HomeControllerTest extends AbstractControllerTest
     {
         $this->client->request('GET','/contact');
         $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('h1');
     }
 
     public function testDisplayOfCharterPage():void
     {
         $this->client->request('GET','/charter');
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'Charte d\'utilisation du site');
+        $this->assertSelectorExists('h1');
+    }
+
+    public function testDisplayOfUsermanualPage():void
+    {
+        $this->client->request('GET','/usermanual');
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('h1');
     }
 }

@@ -113,7 +113,7 @@ final class OrganisationController extends AbstractController
             throw $this->createNotFoundException('Il n\'y a pas d\'utilisateur connecté!');
         }
 
-        if (in_array('ROLE_ADMIN', $currentUser->getRoles(), true) && $id !== null) {
+        if (in_array('ROLE_ADMIN', $currentUser->getRoles(), true)) {
             if (!$id){
                 throw $this->createNotFoundException('id manquant!');
             }
