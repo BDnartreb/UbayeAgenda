@@ -186,26 +186,45 @@ final class EventControllerTest extends AbstractControllerTest
     /**
      * @dataProvider provideUpdateEventData
      */
-    public function testUpdateEventIsSuccessful(string $email, string $path, string $method, string $codeHttp): void
+    public function testUpdateEventIsSuccessful(string $email, string $method, string $path, string $codeHttp): void
     {
-        if ($email !== null){
-            $connectedUser = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $email]);
-            $this->client->loginUser($connectedUser);
-        }
+        $eventName = 'EventTestName1';
+        $eventDescriptionModified = 'EventTestName1DescriptionModified';
+        
+        $connectedUser = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $email]);
+        $this->client->loginUser($connectedUser);
 
         $event = $this->em->getRepository(Event::class)->findOneBy(['name' => 'EventTestName1']);
         $eventId = $event->getId();
-
         $crawler = $this->client->request($method, $path . $eventId);
         $this->assertResponseStatusCodeSame(constant(Response::class . '::' . $codeHttp));
-        $this->assertSelectorTextContains('h1', 'EventTestName1');
+        $this->assertSame($eventName, $crawler->filter('input[name="event[name]"]')->attr('value'));
+
+        $form = $crawler->filter('form[name="event"]')->form([
+            'event[name]' => $eventName,
+            // 'event[startDate]' => (new \DateTime())->format('Y-m-d\TH:i'),
+            'event[startDate]' => (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d\TH:i'),
+            'event[endDate]' => (new \DateTime('+2 days', new \DateTimeZone('UTC')))->format('Y-m-d\TH:i'),
+            'event[description]' => $eventDescriptionModified,
+            'event[fee]' => '2',
+            'event[comment]' => '',
+            'event[thematic]' => '3',
+            'event[public]' => '1',
+            'event[location]' => '44',
+        ]);
+        $this->client->submit($form);
+
+        $this->assertResponseRedirects('/event/event/' . $eventId, Response::HTTP_FOUND);
+        $this->client->followRedirect();
+
+        $this->assertSelectorTextContains('.clamp3', $eventDescriptionModified);
     }
 
     public function provideUpdateEventData(): \Generator
     {
 
-        yield 'user_organisation_to_event_update' => ['orgatest@email.com', 'GET', '/organisation/event/update/', 'HTTP_FOUND'];
-        yield 'user_admin_to_event_update' => ['admin@ubayeagenda.com', 'GET', '/organisation/event/update/', 'HTTP_FOUND'];    
+        yield 'user_organisation_to_event_update' => ['orgatest@email.com', 'GET', '/organisation/event/update/', 'HTTP_OK'];
+        yield 'user_admin_to_event_update' => ['admin@ubayeagenda.com', 'GET', '/organisation/event/update/', 'HTTP_OK'];    
     }
 
     /**

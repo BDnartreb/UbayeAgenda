@@ -170,7 +170,7 @@ final class EventController extends AbstractController
              throw $this->createAccessDeniedException();
         }
 
-        if ($organisation === $connectedUser){
+        if ($organisation === $connectedUser || $connectedUser === $admin){
             if ($form->isSubmitted() && $form->isValid())
             {
                 $file = $event->getFile();
