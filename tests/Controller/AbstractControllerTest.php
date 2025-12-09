@@ -22,11 +22,7 @@ abstract class AbstractControllerTest extends WebTestCase
 
     protected function setUp(): void
     {
-        //parent::setUp();
         self::ensureKernelShutdown(); // shutdown the kernel before creating a new client
-        // $this->client = static::createClient();
-        // $this->container = static::getContainer();
-        // $this->em = $this->client->getContainer()->get(EntityManagerInterface::class);
 
         $this->client = static::createClient();
         $this->container = $this->client->getContainer();
@@ -87,7 +83,7 @@ abstract class AbstractControllerTest extends WebTestCase
 
     protected function tearDown(): void
     {
-        // Supprimer toutes les entités enregistrées
+        // Delete data written in database during test
         foreach ($this->entitiesToRemove as $entity) {
             $this->em->remove($entity);
         }

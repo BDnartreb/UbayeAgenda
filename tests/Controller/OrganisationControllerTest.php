@@ -61,7 +61,6 @@ final class OrganisationControllerTest extends AbstractControllerTest
             $this->assertEquals($newOrgaName, $newOrga->getName());
             $this->assertNotSame('password', $newOrga->getPassword());
             
-            //$this->assertTrue($this->client->getResponse()->isRedirect());
             $this->assertResponseRedirects('/logout');
             $this->client->followRedirect();
             $this->assertResponseRedirects('/login');
@@ -70,9 +69,9 @@ final class OrganisationControllerTest extends AbstractControllerTest
             $this->assertSelectorExists('form');
             $this->assertSelectorTextContains('h1', 'Connexion');
 
-            // Called from AbstractControllerTest
-// FAILED Cf AbstractControllerTest
-            // $this->scheduleForRemoval($newOrga);
+            $saved = $this->em->getRepository(Organisation::class)->find($newOrga->getId());
+            $this->assertNotNull($saved);
+            $this->scheduleForRemoval($saved);
     }
 
     /**
@@ -181,6 +180,7 @@ final class OrganisationControllerTest extends AbstractControllerTest
 
     public function testOrganisationDeleteIsSuccessful():void
     {
+        
         $orgaToDeleteEmail = "orgatodelete@email.com"; 
         $orgaToDelete = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $orgaToDeleteEmail]);
         $this->client->loginUser($orgaToDelete);
@@ -225,7 +225,7 @@ final class OrganisationControllerTest extends AbstractControllerTest
         $this->assertResponseRedirects('/home', Response::HTTP_OK);
     }
 
-    public function testDisplayOfOrganisationListForAdminIsSuccessful():void
+    public function testDisplayOrganisationListForAdminIsSuccessful():void
     {
         $adminEmail = "admin@ubayeagenda.com";
         $path = "/admin/organisations";
@@ -240,7 +240,7 @@ final class OrganisationControllerTest extends AbstractControllerTest
         $this->assertSelectorCount($numberExpected, '.orga-small-card');
     }
     
-    public function testDisplayOfOrganisationPageIsSuccessful():void
+    public function testDisplayOrganisationPageIsSuccessful():void
     {
         $email = "orgatest@email.com"; 
         $organisationRepository = $this->em->getRepository(Organisation::class);
@@ -260,7 +260,7 @@ final class OrganisationControllerTest extends AbstractControllerTest
     /**
      * @dataProvider provideAccessData
      */
-    public function testAccessByOrganisationOrAdmin(string $email, string $path, string $method, string $codeHttp):void
+    public function testAccessByOrganisationOrAdminToProtectedRoute(string $email, string $path, string $method, string $codeHttp):void
     {
         $organisation = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $email]);
         $this->client->loginUser($organisation);

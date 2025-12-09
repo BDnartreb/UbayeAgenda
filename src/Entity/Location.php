@@ -18,9 +18,11 @@ class Location
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
+    #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(length: 255)]
     private ?string $address = null;
 
@@ -29,7 +31,7 @@ class Location
     private ?TownEnum $town = null;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 8,  nullable: true)]
-    #[Assert\Regex(pattern: '/^[-+]?([0-8]?\d(\.\d+)?|90(\.0+)?)$/', message: 'Latitude invalide.')]
+    #[Assert\Regex(pattern: '/^[-+]?([0-8]?\d(\.\d+)?|90(\.0+)?)$/', message: 'Latitude invalide')]
     private ?string $lat = null;
 
     #[ORM\Column(type: 'decimal', precision: 11, scale: 8, nullable: true)]
@@ -69,7 +71,7 @@ class Location
         return $this->address;
     }
 
-    public function setAddress(string $address): static
+    public function setAddress(?string $address): static
     {
         $this->address = $address;
 
@@ -81,7 +83,7 @@ class Location
         return $this->town;
     }
 
-    public function setTown(TownEnum $town): static
+    public function setTown(?TownEnum $town): self
     {
         $this->town = $town;
 

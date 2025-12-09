@@ -81,13 +81,11 @@ final class EventControllerTest extends AbstractControllerTest
         $this->assertSelectorExists('form[name="event"]');
 
         $eventName = 'NewEvent';
-        $startDate = new \DateTime();
         $locationId = $this->em->getRepository(Location::class)->findOneBy(['name' => 'LocationTest'])->getId();
                 
         $form = $crawler->filter('form[name="event"]')->form([
             'event[name]' => $eventName,
             'event[startDate]' => (new \DateTime())->format('Y-m-d\TH:i'),
-            // 'event[startDate]' => $startDate,
             'event[description]' => 'Blabla',
             //'event[poster]' => '',
             'event[fee]' => '2',
@@ -99,16 +97,19 @@ final class EventControllerTest extends AbstractControllerTest
 
         $this->client->submit($form);
 
-        $eventId = $this->em->getRepository(Event::class)->findOneBy(['name' => $eventName])->getId();
+        $newEvent = $this->em->getRepository(Event::class)->findOneBy(['name' => $eventName]);
+        $eventId = $newEvent->getId();
         $this->assertResponseRedirects('/event/event/' . $eventId, Response::HTTP_FOUND);
         $this->client->followRedirect();
         $this->assertSelectorTextContains('h1', $eventName);
+
+        $this->scheduleForRemoval($newEvent);
+        $saved = $this->em->getRepository(Event::class)->findOneBy(['name' => $eventName]);
+        $this->assertNotNull($saved);
     }
 
-/**
+    /**
      * @dataProvider provideInvalidEventData
-     * 
-     *
      * @param array<string, mixed> $formData Form fields to submit
      * @param string $expectedErrorMessage
     */
@@ -127,7 +128,6 @@ final class EventControllerTest extends AbstractControllerTest
                
         $form = $crawler->filter('form[name="event"]')->form(array_merge([
             'event[name]' => $eventName,
-            // 'event[startDate]' => (new \DateTime())->format('Y-m-d\TH:i'),
             'event[startDate]' => (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d\TH:i'),
             'event[description]' => 'Blabla',
             //'event[poster]' => '',
@@ -137,8 +137,6 @@ final class EventControllerTest extends AbstractControllerTest
             'event[public]' => '1',
             'event[location]' => $locationId,
         ], $formData));
-
-        //dump($form->getPhpValues());
 
         $this->client->submit($form);
         $this->assertContains(
@@ -161,25 +159,145 @@ final class EventControllerTest extends AbstractControllerTest
         yield 'empty location' => [['event[location]' => ''], 'Ce champ doit être renseigné',];
     }
 
-
-    public function testAddLocationIsSuccessful():void
+    /**
+     * @dataProvider providerUserData
+     */
+    public function testAddLocationIsSuccessful(string $email):void
     {
+        $newLocationName = 'NewLocation';
+        $connectedUser = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $email]);
+        $this->client->loginUser($connectedUser);
+
+        $crawler = $this->client->request('GET', '/organisation/location/add');
+
+        $form = $crawler->filter('form[name="location"]')->form([
+            'location[name]' => $newLocationName,
+            'location[address]' => 'NewAddress',
+            'location[town]' => '1',
+            'location[lat]' => '12.345678',
+            'location[lon]' => '123.4567',
+        ]);
+
+        $this->client->submit($form);
+
+        $newLocation = $this->em->getRepository(Location::class)->findOneBy(['name' => $newLocationName]);
+        $this->assertSame($newLocation->getName(), $newLocationName);
+
+        $this->assertResponseRedirects('/organisation/event/add', Response::HTTP_FOUND);
+        $this->client->followRedirect();
+
+        $this->scheduleForRemoval($newLocation);
+        $saved = $this->em->getRepository(Location::class)->findOneBy(['name' => $newLocationName]);
+        $this->assertNotNull($saved);
+    }
+    /**
+     * @dataProvider provideInvalidLocationData
+     */
+
+    public function testAddLocationWithInvalidDataFailed(array $formData, string $expectedErrorMessage):void
+    {
+        $newLocationName = 'NewLocation';
+        $email = 'orgatest@email.com';
+        $connectedUser = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $email]);
+        $this->client->loginUser($connectedUser);
+
+        $crawler = $this->client->request('GET', '/organisation/location/add');
+
+        $form = $crawler->filter('form[name="location"]')->form(array_merge([
+            'location[name]' => $newLocationName,
+            'location[address]' => 'UpdatedAddress',
+            'location[town]' => '1',
+            'location[lat]' => '',
+            'location[lon]' => '',
+        ], $formData));
+
+        $this->client->submit($form);
+
+        $this->assertContains(
+            $this->client->getResponse()->getStatusCode(),
+            [Response::HTTP_OK, Response::HTTP_UNPROCESSABLE_ENTITY],
+            'La réponse doit être 200 ou 422 selon la version de Symfony'
+        );
+        $this->assertSelectorExists('form[name="location"]');
+        $this->assertSelectorTextContains('.invalid-feedback', $expectedErrorMessage);
+    }
+
+    /**
+     * @dataProvider providerUserData
+     */
+    public function testUpdateLocationIsSuccessful(string $email):void
+    {
+        $locationName = 'LocationTest';
+        $locationId = $this->em->getRepository(Location::class)->findOneBy(['name' => $locationName])->getId();
+        $connectedUser = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $email]);
+        $this->client->loginUser($connectedUser);
+
+        $crawler = $this->client->request('GET', '/organisation/location/update/' . $locationId);
+
+        $form = $crawler->filter('form[name="location"]')->form([
+            'location[name]' => $locationName,
+            'location[address]' => 'UpdatedAddress',
+            'location[town]' => '1',
+            'location[lat]' => '',
+            'location[lon]' => '',
+        ]);
+
+        $this->client->submit($form);
+
+        $this->assertResponseRedirects('/organisation/event/add', Response::HTTP_FOUND);
+        $this->client->followRedirect();
+
+        $this->assertSelectorExists('form[name="event"]'); 
 
     }
 
-    public function testAddLocationWithInvalidDataFailed():void
+    public function providerUserData(): \Generator
     {
-
+        yield 'user_organisation' => ['orgatest@email.com'];
+        yield 'user_admin' => ['admin@ubayeagenda.com'];
     }
 
-    public function testUpdateLocationIsSuccessful():void
+    /**
+     * @dataProvider provideInvalidLocationData 
+     */
+    public function testUpdateLocationWithInvalidDataFailed(array $formData, string $expectedErrorMessage):void
     {
+        $locationName = 'LocationTest';
+        $email = 'orgatest@email.com';
+        $locationId = $this->em->getRepository(Location::class)->findOneBy(['name' => $locationName])->getId();
+        $connectedUser = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $email]);
+        $this->client->loginUser($connectedUser);
 
+        $crawler = $this->client->request('GET', '/organisation/location/update/' . $locationId);
+
+        $form = $crawler->filter('form[name="location"]')->form(array_merge([
+            'location[name]' => $locationName,
+            'location[address]' => 'UpdatedAddress',
+            'location[town]' => '1',
+            'location[lat]' => '',
+            'location[lon]' => '',
+        ], $formData));
+       $this->client->submit($form);
+       
+       $this->assertContains(
+            $this->client->getResponse()->getStatusCode(),
+            [Response::HTTP_OK, Response::HTTP_UNPROCESSABLE_ENTITY],
+            'La réponse doit être 200 ou 422 selon la version de Symfony'
+        );
+        $this->assertSelectorExists('form[name="location"]');
+        $this->assertSelectorTextContains('.invalid-feedback', $expectedErrorMessage);
+        //$this->assertSelectorExists('.invalid-feedback');
     }
 
-    public function testUpdateLocationWithInvalidDataFailed():void
+    public function provideInvalidLocationData(): \Generator
     {
-
+        yield 'empty name' => [['location[name]' => ''], 'Ce champ doit être renseigné',];
+        yield 'empty address' => [['location[address]' => ''], 'Ce champ doit être renseigné',];
+        yield 'empty town' => [['location[town]' => ''], 'Ce champ doit être renseigné',];
+        yield 'small number lat' => [['location[lat]' => '123'], 'Latitude invalide',];
+        yield 'without coma lat' => [['location[lat]' => '12345678'], 'Latitude invalide',];
+        yield 'big number lon' => [['location[lon]' => '12345678910111213141516'], 'Longitude invalide',];
+        yield 'letters lon' => [['location[lon]' => 'abcd'], 'Longitude invalide',];
     }
 
 
@@ -190,6 +308,8 @@ final class EventControllerTest extends AbstractControllerTest
     {
         $eventName = 'EventTestName1';
         $eventDescriptionModified = 'EventTestName1DescriptionModified';
+        $locationName = 'LocationTest';
+        $locationId = $this->em->getRepository(Location::class)->findOneBy(['name' => $locationName])->getId();
         
         $connectedUser = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $email]);
         $this->client->loginUser($connectedUser);
@@ -210,7 +330,7 @@ final class EventControllerTest extends AbstractControllerTest
             'event[comment]' => '',
             'event[thematic]' => '3',
             'event[public]' => '1',
-            'event[location]' => '44',
+            'event[location]' => $locationId,
         ]);
         $this->client->submit($form);
 
@@ -222,41 +342,74 @@ final class EventControllerTest extends AbstractControllerTest
 
     public function provideUpdateEventData(): \Generator
     {
-
         yield 'user_organisation_to_event_update' => ['orgatest@email.com', 'GET', '/organisation/event/update/', 'HTTP_OK'];
         yield 'user_admin_to_event_update' => ['admin@ubayeagenda.com', 'GET', '/organisation/event/update/', 'HTTP_OK'];    
     }
 
     /**
-     * @dataProvider provideDeleteEventData
+     * @dataProvider providerUserData
      */
-    public function testDeleteEventIsSuccessful():void
+    public function testDeleteEventIsSuccessful(string $email):void
     {
+        $connectedUser = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $email]); 
+        $this->client->loginUser($connectedUser);
 
+        // Create an event to delete
+        $crawler = $this->client->request('GET', '/organisation/event/add');
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('form[name="event"]');
+
+        $eventName = 'CreatedEvent';
+        $locationId = $this->em->getRepository(Location::class)->findOneBy(['name' => 'LocationTest'])->getId();
+                
+        $form = $crawler->filter('form[name="event"]')->form([
+            'event[name]' => $eventName,
+            'event[startDate]' => (new \DateTime())->format('Y-m-d\TH:i'),
+            'event[description]' => 'Blabla',
+            //'event[poster]' => '',
+            'event[fee]' => '2',
+            'event[comment]' => '',
+            'event[thematic]' => '3',
+            'event[public]' => '1',
+            'event[location]' => $locationId,
+        ]);
+
+        $this->client->submit($form);
+ 
+        $eventToDelete = $this->em->getRepository(Event::class)->findOneBy(['name' => $eventName]);
+        $eventToDeleteId = $eventToDelete->getId();
+        $this->client->request('POST', '/organisation/event/delete/' . $eventToDeleteId);
+        
+        $this->assertResponseRedirects('/organisation', Response::HTTP_FOUND);
+        $this->client->followRedirect();
+
+        $this->em->clear();
+        $eventDeleted = $this->em->getRepository(Event::class)->find($eventToDeleteId);
+        $this->assertNull($eventDeleted);
     }
 
     public function provideDeleteEventData(): \Generator
-    {   
-
-        yield 'user_organisation_to_event_delete' => ['orgatest@email.com', '/organisation/event/delete/', 'POST', 'HTTP_FOUND'];
-        yield 'user_admin_to_event_delete' => ['admin@ubayeagenda.com', '/organisation/event/delete/', 'POST', 'HTTP_FOUND'];
-
+    {
+        yield 'user_organisation_to_event_delete' => ['orgatest@email.com', 'EventToDeleteName3' ];
+        yield 'user_admin_to_event_delete' => ['admin@ubayeagenda.com', 'EventToDeleteName4'];
     }
-
 
     public function testEventsForAdminIsSuccessful():void
     {
         $adminEmail = "admin@ubayeagenda.com";
         $path = '/admin/events';
+
         $organisationRepository = $this->em->getRepository(Organisation::class);
         $admin = $organisationRepository->findOneBy(['email' => $adminEmail]);
         $this->client->loginUser($admin);
         $crawler = $this->client->request('GET', $path);
         $this->assertResponseIsSuccessful();
 
+        $this->assertResponseRedirects('/', Response::HTTP_FOUND);
+        $this->client->followRedirect();
+
         $events = $this->em->getRepository(Event::class)->findAll();
         $numberExpected = count($events);
-        $this->assertSelectorCount($numberExpected, '.event_name');
+        $this->assertSelectorCount($numberExpected, '.item-container');
     }
-
 }

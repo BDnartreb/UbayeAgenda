@@ -125,8 +125,19 @@ final class OrganisationController extends AbstractController
                 throw $this->createNotFoundException('Il n\'est pas permis de supprimer le compte Administrateur!');
             }
         } else {
-            $organisation = $currentUser;
+            // $organisation = $currentUser;
+            $organisation = $this->em->getRepository(Organisation::class)->find($currentUser->getId());
         }   
+
+
+
+    // Logout si l'utilisateur supprime son propre compte
+    if ($currentUser->getId() === $organisation->getId()) {
+        $tokenStorage->setToken(null);
+        $request->getSession()->invalidate();
+
+    }
+
 
         // Check CSRF token
         if (!$this->isCsrfTokenValid('delete'.$organisation->getId(), $request->request->get('_token'))) {
@@ -134,11 +145,16 @@ final class OrganisationController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        // Logout user if connected
-        if ($currentUser === $organisation) {
-            $tokenStorage->setToken(null);
-            $request->getSession()->invalidate();
-        }
+            // Logout si l'utilisateur supprime son propre compte
+    if ($currentUser->getId() === $organisation->getId()) {
+        $tokenStorage->setToken(null);
+        $request->getSession()->invalidate();
+    }
+        // // Logout user if connected
+        // if ($currentUser === $organisation) {
+        //     $tokenStorage->setToken(null);
+        //     $request->getSession()->invalidate();
+        // }
 
         $this->em->remove($organisation);
         $this->em->flush();
