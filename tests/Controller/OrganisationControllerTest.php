@@ -180,21 +180,28 @@ final class OrganisationControllerTest extends AbstractControllerTest
 
     public function testOrganisationDeleteIsSuccessful():void
     {
-        
         $orgaToDeleteEmail = "orgatodelete@email.com"; 
         $orgaToDelete = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $orgaToDeleteEmail]);
+
+        $session = static::getContainer()->get('session.factory')->createSession();
+        $cookie = new \Symfony\Component\BrowserKit\Cookie($session->getName(), $session->getId());
+        $this->client->getCookieJar()->set($cookie);
+
         $this->client->loginUser($orgaToDelete);
 
         $eventsToDelete = $this->em->getRepository(Event::class);
         $eventCountBeforeDelete = $eventsToDelete->count(['organisation' => $orgaToDelete]);
         $this->assertGreaterThan(0, $eventCountBeforeDelete);
 
-        $this->client->request('GET', '/organisation');
-        $csrfTokenManager = $this->container->get('security.csrf.token_manager');
-        $token = $csrfTokenManager->getToken('delete' . $orgaToDelete->getId())->getValue();
+        // $csrfTokenManager = $this->container->get('security.csrf.token_manager');
+
+    $csrfTokenManager = static::getContainer()->get('security.csrf.token_manager');
+    $token = $csrfTokenManager->getToken('delete' . $orgaToDelete->getId())->getValue();
+        
+        // $token = $csrfTokenManager->getToken('delete' . $orgaToDelete->getId())->getValue();
     // FAILED error message There is currently no session available.
 
-        $this->client->request('POST', '/organisation/delete', ['_token' => $token]);
+        $this->client->request('POST', '/organisation/delete/' . $orgaToDelete->getId(), ['_token' => $token]);
 
         $this->assertResponseRedirects('/');
         $this->client->followRedirect();

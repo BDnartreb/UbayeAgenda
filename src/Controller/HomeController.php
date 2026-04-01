@@ -32,16 +32,6 @@ final class HomeController extends AbstractController
         return $this->redirectToRoute('eventlist');
     }
 
-    // #[Route('/eventlist', name: 'eventlist')]
-    // public function eventlist(EventRepository $eventRepository): Response
-    // {
-    //     $events = $eventRepository->findAllOrderedByStartDateFromToday();
-    //     return $this->render('home/eventlist.html.twig', [
-    //         'controller_name' => 'HomeController',
-    //         'events' => $events,
-    //     ]);
-    // }
-
     #[Route('/eventlist', name: 'eventlist', methods: ['GET'])]
     public function eventlist(EventRepository $eventRepository, Request $request): Response
     {
