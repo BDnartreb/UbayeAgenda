@@ -163,7 +163,7 @@ final class OrganisationController extends AbstractController
             $today = new \DateTime('today');
             $selectedDate = $today->format('Y-m-d');
         }
-        //$events = $this->em->getRepository(Event::class)->findEventsByOrganisationOrderedByStartDateFromToday($organisationId);
+        
         $events = $this->em->getRepository(Event::class)
             ->findEventsByOrganisation(
                 date: $selectedDate,
@@ -207,7 +207,7 @@ final class OrganisationController extends AbstractController
 
         foreach ($events as $event) {
             $eventsArray[] = [
-                'title' => $event->getName(),
+                'name' => $event->getName(),
                 'start' => $event->getStartDate()->format('Y-m-d\TH:i:s'),
                 'end'   => $event->getEndDate() ? $event->getEndDate()->format('Y-m-d\TH:i:s') : null,
                 'color' => '#3788d8', // optionnel

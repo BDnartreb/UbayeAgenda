@@ -82,15 +82,12 @@ class EventType extends AbstractType
                 'label' => 'Affiche',
                 'mapped' => true,
                 'constraints' => [
-                    new Assert\File([
-                        'maxSize' => '2M',
-                        'maxSizeMessage' => 'Le fichier ne doit pas dépasser {{ limit }} Mo',
-                        'mimeTypes' => [
-                            'image/jpeg',
-                            'image/png',
-                        ],
-                        'mimeTypesMessage' => 'Le fichier doit être de type JPG ou PNG.',
-                    ]),
+                    new Assert\File(
+                        maxSize: '2M',
+                        maxSizeMessage: 'Le fichier ne doit pas dépasser {{ limit }} Mo',
+                        mimeTypes: ['image/jpeg', 'image/png',],
+                        mimeTypesMessage: 'Le fichier doit être de type JPG ou PNG.',
+                    ),
                 ],
                 'required' => false,
             ])

@@ -35,6 +35,7 @@ final class HomeController extends AbstractController
     #[Route('/eventlist', name: 'eventlist', methods: ['GET'])]
     public function eventlist(EventRepository $eventRepository, Request $request): Response
     {
+        //dd($this->getUser());
         //Filter Parameters
         $organisations = $this->em->getrepository(Organisation::class)->findAll();
         $thematics = ThematicEnum::cases();
@@ -42,7 +43,7 @@ final class HomeController extends AbstractController
         $publics = PublicEnum::cases();
         $towns = TownEnum::cases();
         $locations = $this->em->getrepository(Location::class)->findAll();
-        $period = 365;
+        //$period = 365;
 
         // Filters selected
         $selectedThematics = $request->query->all('thematics');
@@ -58,7 +59,8 @@ final class HomeController extends AbstractController
         $selectedOrganisations = $request->query->all('organisations');
             $selectedOrganisationsId = [];
             foreach ($selectedOrganisations as $orgaName) {
-                $organisationId = $this->em->getRepository(Organisation::class)->findOneBy(['name' => $orgaName])->getId();
+                $organisationId = $this->em->getRepository(Organisation::class)
+                                    ->findOneBy(['name' => $orgaName])->getId();
                 $selectedOrganisationsId[] = $organisationId;
             }
 

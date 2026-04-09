@@ -41,8 +41,9 @@ final class EventController extends AbstractController
     public function add(Request $request, SessionInterface $session): Response
     {
         $event = new Event();
+        /** @var \App\Entity\Organisation|null $organisation */
         $organisation = $this->getUser();
-        if(!$organisation){
+        if(!$organisation instanceof Organisation){
             throw $this->createNotFoundException('Admin introuvable!');
         }
 

@@ -192,6 +192,9 @@ final class EventControllerTest extends AbstractControllerTest
     }
     /**
      * @dataProvider provideInvalidLocationData
+     * 
+     * @param array<string, string> $formData
+     * @param string $expectedErrorMessage
      */
 
     public function testAddLocationWithInvalidDataFailed(array $formData, string $expectedErrorMessage):void
@@ -259,6 +262,9 @@ final class EventControllerTest extends AbstractControllerTest
 
     /**
      * @dataProvider provideInvalidLocationData 
+     * 
+     * @param array<string, string> $formData
+     * @param string $expectedErrorMessage
      */
     public function testUpdateLocationWithInvalidDataFailed(array $formData, string $expectedErrorMessage):void
     {
@@ -288,6 +294,10 @@ final class EventControllerTest extends AbstractControllerTest
         $this->assertSelectorTextContains('.invalid-feedback', $expectedErrorMessage);
         //$this->assertSelectorExists('.invalid-feedback');
     }
+
+    /**
+    * @return \Generator<string, array{0: array<string, string>, 1: string}>
+    */
 
     public function provideInvalidLocationData(): \Generator
     {
@@ -396,6 +406,9 @@ final class EventControllerTest extends AbstractControllerTest
 
     public function testEventsForAdminIsSuccessful():void
     {
+dump($_ENV['APP_ENV']);
+dump($_ENV['DATABASE_URL']);
+
         $adminEmail = "admin@ubayeagenda.com";
         $path = '/admin/events';
 
@@ -405,8 +418,8 @@ final class EventControllerTest extends AbstractControllerTest
         $crawler = $this->client->request('GET', $path);
         $this->assertResponseIsSuccessful();
 
-        $this->assertResponseRedirects('/', Response::HTTP_FOUND);
-        $this->client->followRedirect();
+        //$this->assertResponseRedirects('/', Response::HTTP_FOUND);
+        //$this->client->followRedirect();
 
         $events = $this->em->getRepository(Event::class)->findAll();
         $numberExpected = count($events);

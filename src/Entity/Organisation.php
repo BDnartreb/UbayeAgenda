@@ -261,9 +261,10 @@ class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-        /**
-     * @see UserInterface
+    /**
+     * @deprecated since Symfony 7.3
      */
+    #[\Deprecated('Not needed anymore since Symfony 7.3')]
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here

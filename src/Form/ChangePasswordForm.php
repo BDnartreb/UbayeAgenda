@@ -33,9 +33,7 @@ class ChangePasswordForm extends AbstractType
                 ],
                 'first_options' => [
                     'constraints' => [
-                        new NotBlank([
-                            'message' => 'Entrez un mot de passe - Please enter a password',
-                        ]),
+                        new NotBlank(message: 'Entrez un mot de passe - Please enter a password'),
                         // new Length([
                         //     'min' => 12,
                         //     'minMessage' => 'Your password should be at least {{ limit }} characters',

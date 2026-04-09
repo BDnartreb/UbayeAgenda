@@ -48,9 +48,7 @@ class RegisterType extends AbstractType
                 'required' => true,
                 'mapped' => false,
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Ce champ doit être renseigné',
-                    ]),
+                    new NotBlank(message: 'Ce champ doit être renseigné'),
                 ],
             ])          
             
