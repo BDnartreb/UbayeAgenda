@@ -179,6 +179,13 @@ body {
     justify-content: center;
 }
 
+.standard-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width : 75vw;
+}
+
 .left-container {
     width: 25vw;
     display: flex;

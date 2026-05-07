@@ -25,7 +25,6 @@
       const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'fr',
-
         firstDay: 1,
 
         headerToolbar: {
@@ -39,10 +38,22 @@
         buttonText: {
           today: 'Aujourd\'hui',
           dayGridMonth: 'Mois',
-          dayGridWeek: 'Semaine',
+          timeGridWeek: 'Semaine',
         },
 
         nowIndicator: true,
+
+        eventContent: function(arg) {
+            return {
+                html: `
+                    <div class="fc-event-custom">
+                        <div class="fc-event-time">${arg.timeText} - ${arg.event.extendedProps.name}</div>
+                        <div class="fc-event-time">${arg.event.extendedProps.organisation}</div>
+                        <div> ${arg.event.extendedProps.location} - ${arg.event.extendedProps.town}</div>
+                    </div>
+                `
+            };
+        },
 
         // display specific field (organisation)
         eventDidMount: function(info) {

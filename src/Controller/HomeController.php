@@ -134,9 +134,15 @@ final class HomeController extends AbstractController
     }
 
     #[Route('/usermanual', name: 'usermanual')]
-    public function usermanual(): Response
+    public function usermanualVisitor(): Response
     {
         return $this->render('home/usermanual.html.twig');
+    }
+    
+    #[Route('/usermanualOrganisation', name: 'usermanualOrganisation')]
+    public function usermanualOrganisation(): Response
+    {
+        return $this->render('home/usermanualOrganisation.html.twig');
     }
 
     #[Route('/test-mail')]
