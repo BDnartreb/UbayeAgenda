@@ -79,8 +79,12 @@ class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'organisation', cascade: ['remove'])]
     private Collection $events;
 
+    /**
+     * @var Collection<int, Location>
+     */
+    #[ORM\ManyToMany(targetEntity: Location::class, mappedBy: 'organisations', cascade: ['remove'])]
+    private Collection $locations;
 
-    
     public function __construct()
     {
         $this->events = new ArrayCollection();

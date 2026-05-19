@@ -29,7 +29,10 @@ class EventType extends AbstractType
             ->add('location', EntityType::class, [
                 'class' => Location::class,
                 'label' => 'Lieu',
-                'choice_label' => 'name',
+                //'choice_label' => 'name',
+                'choice_label' => function (Location $location) {
+                    return $location->getName() . ' - ' . $location->getTown()->value;
+                },
                 'placeholder' => '— Sélectionner un lieu —',
                 'required' => true,
             ])
@@ -61,25 +64,25 @@ class EventType extends AbstractType
                 'label' => 'Thématique',
                 'choices' => ThematicEnum::cases(),
                 'choice_label' => fn (ThematicEnum $thematic) => ucfirst($thematic->value),
-                'placeholder' => "Sélectionner une thématique",
+                'placeholder' => "-- Sélectionner une thématique --",
                 'required' => true,
             ])
             ->add('fee', ChoiceType::class, [
                 'label' => 'Tarif',
                 'choices' => FeeEnum::cases(),
                 'choice_label' => fn (FeeEnum $fee) => ucfirst($fee->value),
-                'placeholder' => "Sélectionner un tarif",
+                'placeholder' => "-- Sélectionner un tarif --",
                 'required' => true,
             ])
             ->add('public', ChoiceType::class, [
                 'label' => 'Catégorie de public',
                 'choices' => PublicEnum::cases(),
                 'choice_label' => fn (PublicEnum $public) => ucfirst($public->value),
-                'placeholder' => "Sélectionner une catégorie de public",
+                'placeholder' => "-- Sélectionner une catégorie de public --",
                 'required' => true,
             ])
             ->add('file', FileType::class, [
-                'label' => 'Affiche',
+                'label' => 'Affiche au format .JPG ou .PNG (.PDF non accepté)',
                 'mapped' => true,
                 'constraints' => [
                     new Assert\File(

@@ -68,6 +68,7 @@
                             <div class=""><h2> {{ event.name }} </h2></div>
                             <div class=""><h4>{{ event.startDate|date('l d/m/Y - H:i')  }} à {{ event.endDate|date('H:i') }}</h4></div>
                             <div class=""><h4>{{ event.location.name }} - {{ event.location.town.value }}</h4></div>
+                            <div class=""><h5>{{ event.thematic.value }} - {{ event.fee.value }} - Public : {{ event.public.value }}</h5></div>
                         </div>
                     </div>
                 </a>

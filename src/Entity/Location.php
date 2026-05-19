@@ -6,6 +6,7 @@ use App\Enum\TownEnum;
 use App\Repository\LocationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -38,11 +39,20 @@ class Location
     #[Assert\Regex(pattern: '/^[-+]?((1[0-7]\d|0?\d?\d)(\.\d+)?|180(\.0+)?)$/', message: 'Longitude invalide')]
     private ?string $lon = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $information = null;
+
     /**
      * @var Collection<int, Event>
      */
     #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'location')]
     private Collection $events;
+
+    /**
+     * @var Collection<int, organisation>
+     */
+    #[ORM\ManyToMany(targetEntity: Organisation::class, inversedBy: 'locations')]
+    private Collection $organisations;
 
     public function __construct()
     {
@@ -110,6 +120,18 @@ class Location
     public function setLon(?string $lon): static
     {
         $this->lon = $lon;
+
+        return $this;
+    }
+
+    public function getInformation(): ?string
+    {
+        return $this->information;
+    }
+
+    public function setInformation(?string $information): static
+    {
+        $this->information = $information;
 
         return $this;
     }

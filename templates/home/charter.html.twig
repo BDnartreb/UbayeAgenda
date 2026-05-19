@@ -5,23 +5,22 @@
 {% block content %}
     <div class="main-container">
         <div class="standard-container">
-           
             <h1>Charte de l’utilisateur</h1>
-            <p>Ah si j'avais su qu'il y avait cela hier j'y serais allé !</p>
-            <p>Cet agenda a pour objectif de regrouper sur un même canal les événements organisés dans 
-                la Vallée de l'Ubaye.</p>                            
-
-            <p>Il est autogéré, les événements sont renseignés par leurs organisateurs.</p>
-            <p> Ce site appelle donc à de la discipline dans son utilisation.</p>
-
-            <p>Sont bienvenus sur cet agenda les événements ouverts à tous, 
-                l'objectif n'est pas de répertorier les événements privés ou à but commercial ou publicitaire.
+            <p>Cet agenda a pour objectif de regrouper sur un même canal
+             les événements organisés dans la Vallée de l'Ubaye.
+            </p>                            
+            <p>Il est autogéré, les événements sont renseignés par leur organisateur.
+             Ce site appelle donc à de la discipline dans son utilisation.
+            </p>
+            <p>Sont bienvenus sur cet agenda les événements ouverts à tous,
+             l'objectif n'est pas de répertorier les événements privés ou à but commercial ou publicitaire.
             </p> 
-
-            <a href=" {{ path=('usermanualOrganisation') }}" target="_blank">Mode d'emploi Organisateur</a><br>
-                   
-            <div><a href="{{ path('register') }}" class="btn-link btn-link-modify">S'inscrire</a></div>
-            
+            <p>Pour plus d'information sur l'utilisation de ce site : 
+            <a href=" {{ path=('usermanualOrganisation') }}" target="_blank">Mode d'Emploi Organisateur</a><br>
+            </p>
+            <div>
+                <a href="{{ path('register') }}" class="btn-link btn-link-modify">S'inscrire</a>
+            </div>          
         </div>
     </div>
 {% endblock %}

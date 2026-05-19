@@ -83,7 +83,7 @@
                     </div>
                 </div>
 
-                <div class="filter-group">
+                {# <div class="filter-group">
                     <input type="checkbox" id="toggle-location" hidden>
                     <label for="toggle-location" class="filter-title">Lieu</label>
                     <div class="filter-options {% if selectedLocations is not empty %}open{% endif %}">
@@ -99,7 +99,7 @@
                             </label><br>
                         {% endfor %}
                     </div>
-                </div>
+                </div> #}
 
                 {% set today = 'now'|date('Y-m-d') %}
                 <div class="filter-group">
@@ -125,6 +125,9 @@
              <button type="submit" class="btn btn-danger">Filtrer</button>
             {# <button type="button" id="reset-filters" class="btn btn-secondary">Réinitialiser</button> #}
             </form>
+            <br>
+            <p>Site hébergé par le Collectif Etoile de la Vallée de l'Ubaye</p>
+            <p>Développé par Bertrand Barbo</p>
         </div>
 
         <div class="central-container">
