@@ -4,18 +4,23 @@ namespace App\Form;
 
 use App\Entity\Event;
 use App\Entity\Location;
+use App\Repository\LocationRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Enum\PublicEnum;
 use App\Enum\FeeEnum;
 use App\Enum\ThematicEnum;
+use App\Enum\EventStatusEnum;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -25,10 +30,21 @@ class EventType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+
+        $organisation = $options['organisation'];
+
         $builder
             ->add('location', EntityType::class, [
                 'class' => Location::class,
                 'label' => 'Lieu',
+                
+                'query_builder' => function (LocationRepository $lr) use ($organisation) {
+                    return $lr->createQueryBuilder('l')
+                        ->where('l.organisation = :organisation')
+                        ->setParameter('organisation', $organisation)
+                        ->orderBy('l.name', 'ASC');
+                },
+
                 //'choice_label' => 'name',
                 'choice_label' => function (Location $location) {
                     return $location->getName() . ' - ' . $location->getTown()->value;
@@ -37,17 +53,16 @@ class EventType extends AbstractType
                 'required' => true,
             ])
             ->add('name', TextType::class, ['label' => "Nom de l'événement", 'required' => true,])
-            //->add('startDate')
             ->add('startDate', DateTimeType::class, [
-                'widget' => 'single_text', // Un seul champ avec date et heure
-                'html5' => true,           // Utilise le <input type="datetime-local">
+                'widget' => 'single_text',
+                'html5' => true,
                 'label' => 'Début',
                 'required' => true,
             ])
-            ->add('endDate', DateTimeType::class, [
-                'widget' => 'single_text', // Un seul champ avec date et heure
-                'html5' => true,           // Utilise le <input type="datetime-local">
-                'label' => 'Fin',
+            ->add('endDate', TimeType::class, [
+                'widget' => 'single_text',
+                'html5' => true,
+                'label' => 'Heure de fin',
                 'required' => false,
             ])
             ->add('description', TextareaType::class, [
@@ -94,6 +109,13 @@ class EventType extends AbstractType
                 ],
                 'required' => false,
             ])
+            ->add('eventstatus', ChoiceType::class, [
+                'label' => 'Niveau de diffusion',
+                'choices' => EventStatusEnum::cases(),
+                'choice_label' => fn (EventStatusEnum $eventStatus) => ucfirst($eventStatus->value),
+                'placeholder' => "-- Sélectionner un niveau de diffusion --",
+                'required' => true,
+            ])
         ;
     }
 
@@ -101,6 +123,7 @@ class EventType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Event::class,
+            'organisation' => null,
         ]);
     }
 }

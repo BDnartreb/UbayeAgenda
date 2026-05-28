@@ -13,6 +13,7 @@ use App\Enum\PublicEnum;
 use App\Enum\StatusEnum;
 use App\Enum\ThematicEnum;
 use App\Enum\TownEnum;
+use App\Enum\EventStatusEnum;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Faker\Factory;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -52,22 +53,8 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         $thematicCases = ThematicEnum::cases();
         $statusCases = StatusEnum::cases();
         $townCases = TownEnum::cases();
+        $eventStatusCases = EventStatusEnum::cases();
         $locationNames = ["Mairie", "Salle des fêtes", "El Zocalo", "Séolane", "Le Grain de Sable", "Lou Fresc"];
-
-        // Create Locations
-        $locations = [];
-
-        foreach ($locationNames as $locationName){
-            $location = new Location;
-            $location->setName($locationName);
-            $location->setAddress("Adresse du lieu de l'événement");
-
-            $randomTown = $townCases[random_int(0,count($townCases)-1)];
-            $location->setTown($randomTown);
-
-            $manager->persist($location);
-            $locations[] = $location;
-        }
 
         // Create Admin
    
@@ -126,6 +113,24 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $organisations[] = $orga;
         }
 
+        // Create Locations
+        $locations = [];
+
+        foreach ($locationNames as $locationName){
+            $location = new Location;
+            $location->setName($locationName);
+            $location->setAddress("Adresse du lieu de l'événement");
+
+            $randomTown = $townCases[random_int(0,count($townCases)-1)];
+            $location->setTown($randomTown);
+
+            $randomOrganisation = $organisations[random_int(0,count($organisations)-1)];
+            $location->setOrganisation($randomOrganisation);
+
+            $manager->persist($location);
+            $locations[] = $location;
+        }
+
         // Create Events
         for ($j=11; $j < 27; $j++) {
             $event = new Event();
@@ -154,6 +159,9 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
 
             $randomPublic = $publicCases[random_int(0, count($publicCases)-1)];
             $event->setPublic($randomPublic);
+
+            $randomEventStatus = $eventStatusCases[random_int(0, count($eventStatusCases)-1)];
+            $event->setEventStatus($randomEventStatus);
             
             $manager->persist($event);
         }

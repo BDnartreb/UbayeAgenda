@@ -143,7 +143,7 @@ class EventRepository extends ServiceEntityRepository
         
         if (!empty($date)) {
             $selectedDate = new \DateTimeImmutable($date);
-            $limitDate = $selectedDate->modify('+15 days');
+            $limitDate = $selectedDate->modify('+365 days');
             $qb->andWhere('e.startDate BETWEEN :date AND :limitDate')
                 ->setParameter('date', $selectedDate)
                 ->setParameter('limitDate', $limitDate);
@@ -161,7 +161,9 @@ class EventRepository extends ServiceEntityRepository
 // $sql = $qb->getQuery()->getSQL();
 // dump($qb->getParameters());
 // dd($sql);
-
+        $eventStatus = "Public";
+        $qb->andWhere('e.eventStatus = :eventstatus')
+            ->setParameter('eventstatus', $eventStatus);
         return $qb->orderBy('e.startDate', 'ASC')
             ->getQuery()
             ->getResult();

@@ -82,12 +82,13 @@ class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Location>
      */
-    #[ORM\ManyToMany(targetEntity: Location::class, mappedBy: 'organisations', cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: Location::class, mappedBy: 'organisation', cascade: ['remove'])]
     private Collection $locations;
 
     public function __construct()
     {
         $this->events = new ArrayCollection();
+        $this->locations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -254,6 +255,35 @@ class Organisation implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($event->getOrganisation() === $this) {
                 $event->setOrganisation(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Location>
+     */
+    public function getLocations(): Collection
+    {
+        return $this->locations;
+    }
+
+    public function addLocation(Location $location): static
+    {
+        if (!$this->locations->contains($location)) {
+            $this->locations->add($location);
+            $location->setOrganisation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLocation (Location $location): static
+    {
+        if($this->locations->removeElement($location)) {
+            if ($location->getOrganisation() === $this) {
+                $location->setOrganisation(null);
             }
         }
 

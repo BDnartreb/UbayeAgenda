@@ -10,7 +10,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Table(name : 'Location')]
+#[ORM\Table(name : 'location')]
 #[ORM\Entity(repositoryClass: LocationRepository::class)]
 class Location
 {
@@ -49,10 +49,11 @@ class Location
     private Collection $events;
 
     /**
-     * @var Collection<int, organisation>
+     * @var Organisation<int, organisation>
      */
-    #[ORM\ManyToMany(targetEntity: Organisation::class, inversedBy: 'locations')]
-    private Collection $organisations;
+    #[ORM\ManyToOne(targetEntity: Organisation::class, inversedBy: 'locations')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Organisation $organisation;
 
     public function __construct()
     {
@@ -132,6 +133,18 @@ class Location
     public function setInformation(?string $information): static
     {
         $this->information = $information;
+
+        return $this;
+    }
+
+     public function getOrganisation(): ?Organisation
+    {
+        return $this->organisation;
+    }
+
+    public function setOrganisation(?Organisation $organisation): static
+    {
+        $this->organisation = $organisation;
 
         return $this;
     }

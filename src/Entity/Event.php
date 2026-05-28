@@ -5,11 +5,13 @@ namespace App\Entity;
 use App\Enum\FeeEnum;
 use App\Enum\PublicEnum;
 use App\Enum\ThematicEnum;
+use App\Enum\EventStatusEnum;
 use App\Repository\EventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
@@ -63,6 +65,10 @@ class Event
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\Column(enumType: PublicEnum::class)]
     private ?PublicEnum $public = null;
+
+    #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
+    #[ORM\Column(enumType: EventStatusEnum::class)]
+    private ?EventStatusEnum $eventStatus = null;
 
     #[Assert\NotBlank(message: "Ce champ doit être renseigné")]
     #[ORM\ManyToOne(inversedBy: 'events')]
@@ -206,6 +212,18 @@ class Event
         return $this;
     }
 
+    public function getEventStatus(): ?EventStatusEnum
+    {
+        return $this->eventStatus;
+    }
+
+    public function setEventStatus(EventStatusEnum $eventStatus): self
+    {
+        $this->eventStatus = $eventStatus;
+
+        return $this;
+    }
+
     public function getLocation(): ?Location
     {
         return $this->location;
@@ -217,4 +235,21 @@ class Event
 
         return $this;
     }
+
+    // #[Assert\Callback]
+    // public function validateDates(ExecutionContextInterface $context): void
+    // {
+    //     if (
+    //         $this->startDate &&
+    //         $this->endDate &&
+    //         $this->endDate < $this->startDate
+    //     ) {
+    //         $context->buildViolation(
+    //             'La date de fin doit être supérieure à la date de début.'
+    //         )
+    //         ->atPath('endDate')
+    //         ->addViolation();
+    //     }
+    // }
+
 }

@@ -13,6 +13,7 @@ use App\Form\LocationType;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Form\FormError;
 
 use function PHPUnit\Framework\throwException;
 
@@ -52,16 +53,17 @@ final class EventController extends AbstractController
         // Récupérer les données sauvegardées en session si elles existent
         $savedData = $session->get('event_form_data', []);
         if (!empty($savedData)) {
-            $form = $this->createForm(EventType::class, $event);
+            // $form = $this->createForm(EventType::class, $event);
+            $form = $this->createForm(EventType::class, $event, ['organisation' => $this->getUser(),]);
             $form->submit($savedData); // pré-remplir le formulaire avec les données
         } else {
-            $form = $this->createForm(EventType::class, $event);
-        }
+            $form = $this->createForm(EventType::class, $event, ['organisation' => $this->getUser(),]);
+        }      
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Gestion du fichier
+                  // Gestion du fichier
             $file = $event->getFile();
             if ($file !== null) {
                 $filename = md5(uniqid()) . '.' . $file->guessExtension();
@@ -69,14 +71,31 @@ final class EventController extends AbstractController
                 $event->getFile()->move('uploads/', $filename);
             }
 
-            $this->em->persist($event);
-            $this->em->flush();
+            $startDate = $event->getStartDate();
+            $endTime = $event->getEndDate();
 
-            // Nettoyer les données en session après enregistrement
-            $session->remove('event_form_data');
+            if ($startDate && $endTime) {
 
-            $this->addFlash('success', 'Événement créé avec succès !');
-            return $this->redirectToRoute('event', ['id' => $event->getId()]);
+                $endDate = (clone $startDate)
+                    ->setTime(
+                        (int) $endTime->format('H'),
+                        (int) $endTime->format('i')
+                    );
+
+                $event->setEndDate($endDate);
+  
+            }
+            
+
+                $this->em->persist($event);
+                $this->em->flush();
+
+                // Nettoyer les données en session après enregistrement
+                $session->remove('event_form_data');
+
+                $this->addFlash('success', 'Événement créé avec succès !');
+                return $this->redirectToRoute('event', ['id' => $event->getId()]);
+
         }
 
         // Si l'utilisateur clique sur "Créer un nouveau lieu", sauvegarder les données dans la session
@@ -99,6 +118,8 @@ final class EventController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
+            $location->setOrganisation($this->getUser());
+
             $this->em->persist($location);
             $this->em->flush();
 
