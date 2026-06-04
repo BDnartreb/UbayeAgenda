@@ -53,7 +53,6 @@ final class EventController extends AbstractController
         // Récupérer les données sauvegardées en session si elles existent
         $savedData = $session->get('event_form_data', []);
         if (!empty($savedData)) {
-            // $form = $this->createForm(EventType::class, $event);
             $form = $this->createForm(EventType::class, $event, ['organisation' => $this->getUser(),]);
             $form->submit($savedData); // pré-remplir le formulaire avec les données
         } else {
@@ -81,21 +80,17 @@ final class EventController extends AbstractController
                         (int) $endTime->format('H'),
                         (int) $endTime->format('i')
                     );
-
-                $event->setEndDate($endDate);
-  
+                $event->setEndDate($endDate);  
             }
-            
 
-                $this->em->persist($event);
-                $this->em->flush();
+            $this->em->persist($event);
+            $this->em->flush();
 
-                // Nettoyer les données en session après enregistrement
-                $session->remove('event_form_data');
+            // Nettoyer les données en session après enregistrement
+            $session->remove('event_form_data');
 
-                $this->addFlash('success', 'Événement créé avec succès !');
-                return $this->redirectToRoute('event', ['id' => $event->getId()]);
-
+            $this->addFlash('success', 'Événement créé avec succès !');
+            return $this->redirectToRoute('event', ['id' => $event->getId()]);
         }
 
         // Si l'utilisateur clique sur "Créer un nouveau lieu", sauvegarder les données dans la session

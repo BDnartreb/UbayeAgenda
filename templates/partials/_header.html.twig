@@ -16,7 +16,7 @@
                     <div class="collapse navbar-collapse" id="menu">
                         <ul class="navbar-nav menu-links">
                             <li class="navbar-item">
-                                <a href="{{ path('home') }}" class="nav-link {{ current == 'eventlist' ? 'active' : '' }}">Programme</a>
+                                <a href="{{ path('home') }}" class="nav-link {{ current == 'eventlist' ? 'active' : '' }}">Agenda</a>
                                 {% if app.user is null %}
                                     <a href="{{ path('login') }}" class="nav-link {{ current == 'login' ? 'active' : '' }}">Connexion</a>
                                 {% endif %}
