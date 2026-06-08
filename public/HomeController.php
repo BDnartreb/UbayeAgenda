@@ -1,0 +1,161 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Location;
+use App\Entity\Organisation;
+use App\Enum\FeeEnum;
+use App\Enum\PublicEnum;
+use App\Enum\ThematicEnum;
+use App\Enum\TownEnum;
+use App\Repository\EventRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\Attribute\Route;
+
+final class HomeController extends AbstractController
+{
+    protected EntityManagerInterface $em;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        $this->em = $em;
+    }
+
+    #[Route('/', name: 'home')]
+    public function index(): Response
+    {    
+        return $this->redirectToRoute('eventlist');
+    }
+
+    #[Route('/eventlist', name: 'eventlist', methods: ['GET'])]
+    public function eventlist(EventRepository $eventRepository, Request $request): Response
+    {
+        //dd($this->getUser());
+        //Filter Parameters
+        $organisations = $this->em->getrepository(Organisation::class)->findAll();
+        $thematics = ThematicEnum::cases();
+        $fees = FeeEnum::cases();
+        $publics = PublicEnum::cases();
+        $towns = TownEnum::cases();
+        $locations = $this->em->getrepository(Location::class)->findAll();
+        //$period = 365;
+
+        // Filters selected
+        $selectedThematics = $request->query->all('thematics');
+        $selectedFees = $request->query->all('fees');
+        $selectedPublics = $request->query->all('publics');
+        $selectedTowns = $request->query->all('towns');
+        $selectedDate = $request->query->get('selectedDate');
+        if(!$selectedDate){
+            $today = new \DateTime('today');
+            $selectedDate = $today->format('Y-m-d');
+        }
+
+        $selectedOrganisations = $request->query->all('organisations');
+            $selectedOrganisationsId = [];
+            foreach ($selectedOrganisations as $orgaName) {
+                $organisationId = $this->em->getRepository(Organisation::class)
+                                    ->findOneBy(['name' => $orgaName])->getId();
+                $selectedOrganisationsId[] = $organisationId;
+            }
+
+        $selectedLocations = $request->query->all('locations');
+            $selectedLocationsId = [];
+            foreach ($selectedLocations as $locationName) {
+                $locationId = $this->em->getRepository(Location::class)->findOneBy(['name' => $locationName])->getId();
+                $selectedLocationsId[] = $locationId;
+            }
+
+        //events selected
+        $events = $eventRepository->findEventsOrderedByStartDate(
+            fees: $selectedFees,
+            thematics: $selectedThematics,
+            publics: $selectedPublics,
+            towns: $selectedTowns,
+            organisations: $selectedOrganisationsId,
+            locations: $selectedLocationsId,
+            date: $selectedDate,
+        );
+
+        $noEventSelectedMessage = null;
+        if (!$events){
+            $noEventSelectedMessage = "Aucun événement ne correspond à la sélection";
+        }
+
+        // filter parameters and filters selected
+        return $this->render('home/eventlist.html.twig', [
+            'controller_name' => 'HomeController',
+            'events' => $events,
+            'thematics' => $thematics,
+            'fees' => $fees,
+            'publics' => $publics,
+            'towns' => $towns,
+            'organisations' => $organisations,
+            'locations' => $locations,
+            'selectedThematics' => $selectedThematics,   
+            'selectedFees' => $selectedFees,            
+            'selectedPublics' => $selectedPublics,            
+            'selectedTowns' => $selectedTowns,            
+            'selectedOrganisations' => $selectedOrganisations,            
+            'selectedLocations' => $selectedLocations,
+            'selectedDate' => $selectedDate,
+            'noEventSelectedMessage' => $noEventSelectedMessage,
+        ]);
+    }
+
+
+    #[Route('/posters', name: 'posters')]
+    public function posters(): Response
+    {
+        return $this->render('home/posters.html.twig', [
+            'controller_name' => 'HomeController',
+        ]);
+    }
+
+    #[Route('/contact', name: 'contact')]
+    public function contact(): Response
+    {
+        return $this->render('home/contact.html.twig', [
+            'controller_name' => 'HomeController',
+        ]);
+    }
+
+    #[Route('/charter', name: 'charter')]
+    public function charter(): Response
+    {
+        return $this->render('home/charter.html.twig', [
+            'controller_name' => 'HomeController',
+        ]);
+    }
+
+    #[Route('/usermanual', name: 'usermanual')]
+    public function usermanualVisitor(): Response
+    {
+        return $this->render('home/usermanual.html.twig');
+    }
+    
+    #[Route('/usermanualOrganisation', name: 'usermanualOrganisation')]
+    public function usermanualOrganisation(): Response
+    {
+        return $this->render('home/usermanualOrganisation.html.twig');
+    }
+
+    #[Route('/test-mail')]
+    public function test(MailerInterface $mailer): Response
+    {
+        $email = (new Email())
+            ->from('from@example.com')
+            ->to('to@example.com')
+            ->subject('Test Mailpit')
+            ->text('Hello Mailpit !');
+
+        $mailer->send($email);
+
+        return new Response('Email envoyé → http://localhost:8025');
+    }
+}
