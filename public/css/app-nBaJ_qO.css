@@ -14,7 +14,7 @@
     height: 175px;
         /* align-items: stretch; */
             /* justify-content: flex-start; */
-    /* background-image: url('../images/nav-banner.jpg'); */
+    /* background-image: url("../images/nav-banner-2TroSTh.jpg"); */
 /* }  */
 
 .header-container {
@@ -27,7 +27,7 @@
     align-items: start;
     background-size: cover;
     background-position: center;
-    background-image: url('../images/nav-banner.jpg');
+    background-image: url("../images/nav-banner-2TroSTh.jpg");
 }
 
 .logo {
@@ -101,6 +101,7 @@
     justify-content: center;
     color:white;
     background-color: black;
+background-color: red;
     padding: 20px 0px 20px 0px ;
 }
 
@@ -192,7 +193,7 @@ body {
     flex-direction: column;
     margin: 5px 0px 5px 5px;
     padding: 10px 30px 10px 30px;
-    background-color: rgb(245, 242, 238);
+    background-color: rgb(245, 242, 238);;
     border-radius: 20px;      
 }
 

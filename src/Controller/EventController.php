@@ -180,8 +180,8 @@ final class EventController extends AbstractController
         $admin = $this->em->getRepository(Organisation::class)->findOneBy(['email' => $_ENV['ADMIN_EMAIL']]);
         $organisation= $event->getOrganisation();
         $connectedUser = $this->getUser();
-        
-        $form = $this->createForm(EventType::class, $event)->handleRequest($request); 
+
+        $form = $this->createForm(EventType::class, $event, ['organisation' => $organisation])->handleRequest($request); 
 
         if ($organisation !== $connectedUser && $connectedUser !== $admin){
              throw $this->createAccessDeniedException();
