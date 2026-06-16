@@ -13,14 +13,16 @@
 {% endblock %}
 
 {% block javascripts %}
-  <script src="{{ asset('js/filters.js') }}" defer></script>
+//   <script src="{{ asset('js/filters.js') }}" defer></script>
 
   <script>
     function initCalendar() {
       const calendarEl = document.getElementById('calendar');
       if (!calendarEl) return; // sécurité
      
-      const eventsData = JSON.parse(`{{ events|json_encode|raw }}`);
+    //   const eventsData = JSON.parse(`{{ events|json_encode|raw }}`);
+
+      const eventsData = {{ events|json_encode|raw }};
      
       const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
