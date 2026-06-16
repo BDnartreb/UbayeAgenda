@@ -27,18 +27,18 @@ class LocationType extends AbstractType
                 'placeholder' => 'Selectionner une commune',
                 'required' => true,
             ])
-            ->add('lat', TextType::class, [
-                'label' => 'Latitude',
-                'required' => false,
-                'attr' => ['placeholder' => 'exple : 48.856613',
-                ],
-            ])
-            ->add('lon', TextType::class, [
-                'label' => 'Longitude',
-                'required' => false,
-                'attr' => ['placeholder' => 'exple : 2.352222',
-                ],
-                ])
+            // ->add('lat', TextType::class, [
+            //     'label' => 'Latitude',
+            //     'required' => false,
+            //     'attr' => ['placeholder' => 'exple : 48.856613',
+            //     ],
+            // ])
+            // ->add('lon', TextType::class, [
+            //     'label' => 'Longitude',
+            //     'required' => false,
+            //     'attr' => ['placeholder' => 'exple : 2.352222',
+            //     ],
+            // ])
         ;
     }
 

@@ -112,7 +112,15 @@ class EventType extends AbstractType
             ->add('eventstatus', ChoiceType::class, [
                 'label' => 'Niveau de diffusion',
                 'choices' => EventStatusEnum::cases(),
-                'choice_label' => fn (EventStatusEnum $eventStatus) => ucfirst($eventStatus->value),
+                // 'choice_label' => fn (EventStatusEnum $eventStatus) => ucfirst($eventStatus->value),
+                // 'choice_label' => fn (EventStatusEnum $choice) => $choice->value,
+                    'choice_label' => fn (EventStatusEnum $choice) =>
+                        match ($choice) {
+                            EventStatusEnum::DRAFT => 'Mode Brouillon (Organisateur uniquement)',
+                            EventStatusEnum::ORGANISATIONS => 'Interne (Organisateur et Calendrier commun)',
+                            EventStatusEnum::PUBLIC => 'Public (Agenda et Calendrier commun)',
+                        },
+                'choice_value' => fn (?EventStatusEnum $choice) => $choice?->name,
                 'placeholder' => "-- Sélectionner un niveau de diffusion --",
                 'required' => true,
             ])

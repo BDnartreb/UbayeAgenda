@@ -28,9 +28,30 @@
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Mot de passe</label>
-                                <input type="password" class="form-control" id="password" name="_password" required>
+                                {# <input type="password" class="form-control" id="password" name="_password" required> #}
+                                <div class="input-group">
+                                    <input type="password" name="_password" id="password" class="form-control" required>
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-secondary"
+                                        onclick="
+                                            const field = document.getElementById('password');
+                                            field.type = field.type === 'password' ? 'text' : 'password';
+                                        "
+                                    >
+                                        👁
+                                    </button>
+                                </div>                                
+                                
                                 <a href=" {{ path('app_forgot_password_request')}}" alt="S'inscrire">Mot de pass oublié</a>
                             </div>
+
+
+
+
+                            
+                            
                             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                             <button type="submit" class="btn btn-primary">Connexion</button>
                             <br><a href=" {{ path('charter')}}" alt="S'inscrire">Créer un compte</a>

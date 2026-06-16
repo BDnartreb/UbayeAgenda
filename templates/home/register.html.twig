@@ -19,7 +19,19 @@
                             <div class="mb-3">{{ form_row(form.status) }}</div>
                             <div class="mb-3">{{ form_row(form.firstName) }}</div>
                             <div class="mb-3">{{ form_row(form.lastName) }}</div>
-                            <div class="mb-3">{{ form_row(form.plainPassword) }}</div>
+                            {# <div class="mb-3">{{ form_row(form.plainPassword) }}</div> #}
+                            <div><label>Mot de passe</label></div>
+                            <div class="input-group">{{ form_widget(form.plainPassword) }}  
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    onclick="document.getElementById('{{ form.plainPassword.vars.id }}').type =
+                                        document.getElementById('{{ form.plainPassword.vars.id }}').type === 'password'
+                                        ? 'text'
+                                        : 'password';">
+                                    👁
+                                </button>
+                            </div>
 
                             {% if app.user is null %}
                             <label>

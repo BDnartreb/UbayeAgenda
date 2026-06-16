@@ -7,7 +7,6 @@ use App\Enum\FeeEnum;
 use App\Enum\PublicEnum;
 use App\Enum\ThematicEnum;
 use App\Enum\TownEnum;
-use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -42,17 +41,20 @@ class EventRepository extends ServiceEntityRepository
     
         $today = new \DateTime('today');
         $daysBefore = 30;
-        $daysAfter = 365;
+        $daysAfter = 400;
         $periodStart = (clone $today)->sub(new \DateInterval('P' . $daysBefore . 'D'));
         $periodEnd = (clone $today)->add(new \DateInterval('P' . $daysAfter . 'D'));
+        $eventStatuses = ["PUBLIC", "ORGANISATIONS"];
 
-        return $this->createQueryBuilder('e')
+        $qb = $this->createQueryBuilder('e')
             ->where('e.startDate BETWEEN :periodStart AND :periodEnd')
             // ->where('e.startDate >= :periodStart')
             // ->andWhere('e.startDate <= :periodEnd')
-            ->setParameter('periodStart', $periodStart)
-            ->setParameter('periodEnd', $periodEnd)
-            ->orderBy('e.startDate', 'ASC')
+                ->setParameter('periodStart', $periodStart)
+                ->setParameter('periodEnd', $periodEnd);
+            $qb->andWhere('e.eventStatus IN (:eventStatuses)')
+                ->setParameter('eventStatuses', $eventStatuses);
+            return $qb->orderBy('e.startDate', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -143,7 +145,7 @@ class EventRepository extends ServiceEntityRepository
         
         if (!empty($date)) {
             $selectedDate = new \DateTimeImmutable($date);
-            $limitDate = $selectedDate->modify('+365 days');
+            $limitDate = $selectedDate->modify('+400 days');
             $qb->andWhere('e.startDate BETWEEN :date AND :limitDate')
                 ->setParameter('date', $selectedDate)
                 ->setParameter('limitDate', $limitDate);

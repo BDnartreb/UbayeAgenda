@@ -36,11 +36,11 @@
             <div class=""><h4>Présenté par : {{ event.organisation.name }}</h4></div>
             <div class=""><h4>Description : </h4></div>
                 <label class="clamp-wrapper"><input type="checkbox" hidden id="toggle-text">
-                <div class="clamp3">{{ event.description }}</div>
+                <div class="clamp3 text-content">{{ event.description }}</div>
                 </label>
             <div class=""><h4>Commentaires : </h4></div>
                 <label class="clamp-wrapper"><input type="checkbox" hidden id="toggle-text">
-                <div class="clamp3">{{ event.comment }}</div>
+                <div class="clamp3 text-content">{{ event.comment }}</div>
                 </label>  
             <div class=""><h4>{{ event.thematic.value }} - {{ event.fee.value }} - Public : {{ event.public.value }}</h4></div>
             {% if app.user is same as(event.organisation) %} 
